@@ -1,0 +1,59 @@
+diff --git a/node_modules/@rn-primitives/popover/dist/popover.d.ts b/node_modules/@rn-primitives/popover/dist/popover.d.ts
+index c02f456..e3ad5c3 100644
+--- a/node_modules/@rn-primitives/popover/dist/popover.d.ts
++++ b/node_modules/@rn-primitives/popover/dist/popover.d.ts
+@@ -4,6 +4,7 @@ import { View, LayoutRectangle } from 'react-native';
+ import { LayoutPosition } from '@rn-primitives/hooks';
+ import * as React from 'react';
+ import { PortalProps, TriggerRef } from './index.js';
++import { PortalHost } from "@rn-primitives/portal";
+ import './popover';
+
+ interface IRootContext {
+@@ -54,4 +55,4 @@ declare const Close: React.ForwardRefExoticComponent<Omit<react_native.Pressable
+     onKeyUp?: (ev: React.KeyboardEvent) => void;
+ } & React.RefAttributes<View>>;
+
+-export { Close, Content, Overlay, Portal, Root, Trigger, useRootContext };
++export { Close, Content, Overlay, Portal, PortalHost, Root, Trigger, useRootContext };
+diff --git a/node_modules/@rn-primitives/popover/dist/popover.js b/node_modules/@rn-primitives/popover/dist/popover.js
+index 04eeab6..1063226 100644
+--- a/node_modules/@rn-primitives/popover/dist/popover.js
++++ b/node_modules/@rn-primitives/popover/dist/popover.js
+@@ -35,6 +35,7 @@ __export(popover_exports, {
+   Content: () => Content,
+   Overlay: () => Overlay,
+   Portal: () => Portal,
++  PortalHost: () => import_portal.PortalHost,
+   Root: () => Root,
+   Trigger: () => Trigger,
+   useRootContext: () => useRootContext
+@@ -255,6 +256,7 @@ function onStartShouldSetResponder() {
+   Content,
+   Overlay,
+   Portal,
++  PortalHost: import_portal.PortalHost,
+   Root,
+   Trigger,
+   useRootContext
+diff --git a/node_modules/@rn-primitives/popover/dist/popover.mjs b/node_modules/@rn-primitives/popover/dist/popover.mjs
+index eabdc04..25529bd 100644
+--- a/node_modules/@rn-primitives/popover/dist/popover.mjs
++++ b/node_modules/@rn-primitives/popover/dist/popover.mjs
+@@ -2,7 +2,7 @@
+
+ // src/popover.tsx
+ import { useAugmentedRef, useRelativePosition } from "@rn-primitives/hooks";
+-import { Portal as RNPPortal } from "@rn-primitives/portal";
++import { Portal as RNPPortal, PortalHost } from "@rn-primitives/portal";
+ import * as Slot from "@rn-primitives/slot";
+ import * as React from "react";
+ import {
+@@ -219,6 +219,7 @@ export {
+   Content,
+   Overlay,
+   Portal,
++  PortalHost,
+   Root,
+   Trigger,
+   useRootContext

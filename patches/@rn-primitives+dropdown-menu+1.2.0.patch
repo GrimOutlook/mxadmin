@@ -1,0 +1,59 @@
+diff --git a/node_modules/@rn-primitives/dropdown-menu/dist/dropdown-menu.d.ts b/node_modules/@rn-primitives/dropdown-menu/dist/dropdown-menu.d.ts
+index aee9743..b5b65e4 100644
+--- a/node_modules/@rn-primitives/dropdown-menu/dist/dropdown-menu.d.ts
++++ b/node_modules/@rn-primitives/dropdown-menu/dist/dropdown-menu.d.ts
+@@ -4,6 +4,7 @@ import { View, Text, LayoutRectangle } from 'react-native';
+ import { LayoutPosition } from '@rn-primitives/hooks';
+ import * as React from 'react';
+ import { PortalProps, TriggerRef } from './index.js';
++import { PortalHost } from "@rn-primitives/portal";
+ import './dropdown-menu';
+
+ interface IRootContext {
+@@ -125,4 +126,4 @@ declare const SubContent: React.ForwardRefExoticComponent<Omit<react_native.Pres
+     onKeyUp?: (ev: React.KeyboardEvent) => void;
+ } & _rn_primitives_types.ForceMountable & React.RefAttributes<View>>;
+
+-export { CheckboxItem, Content, Group, Item, ItemIndicator, Label, Overlay, Portal, RadioGroup, RadioItem, Root, Separator, Sub, SubContent, SubTrigger, Trigger, useRootContext, useSubContext };
++export { CheckboxItem, Content, Group, Item, ItemIndicator, Label, Overlay, Portal, PortalHost, RadioGroup, RadioItem, Root, Separator, Sub, SubContent, SubTrigger, Trigger, useRootContext, useSubContext };
+diff --git a/node_modules/@rn-primitives/dropdown-menu/dist/dropdown-menu.js b/node_modules/@rn-primitives/dropdown-menu/dist/dropdown-menu.js
+index 1560b2f..194eb4f 100644
+--- a/node_modules/@rn-primitives/dropdown-menu/dist/dropdown-menu.js
++++ b/node_modules/@rn-primitives/dropdown-menu/dist/dropdown-menu.js
+@@ -39,6 +39,7 @@ __export(dropdown_menu_exports, {
+   Label: () => Label,
+   Overlay: () => Overlay,
+   Portal: () => Portal,
++  PortalHost: () => import_portal.PortalHost,
+   RadioGroup: () => RadioGroup,
+   RadioItem: () => RadioItem,
+   Root: () => Root,
+@@ -472,6 +473,7 @@ Content.displayName = "ContentNativeDropdownMenu";
+   Label,
+   Overlay,
+   Portal,
++  PortalHost: import_portal.PortalHost,
+   RadioGroup,
+   RadioItem,
+   Root,
+diff --git a/node_modules/@rn-primitives/dropdown-menu/dist/dropdown-menu.mjs b/node_modules/@rn-primitives/dropdown-menu/dist/dropdown-menu.mjs
+index 9e28da3..f7b6f04 100644
+--- a/node_modules/@rn-primitives/dropdown-menu/dist/dropdown-menu.mjs
++++ b/node_modules/@rn-primitives/dropdown-menu/dist/dropdown-menu.mjs
+@@ -6,7 +6,7 @@ import {
+   useControllableState,
+   useRelativePosition
+ } from "@rn-primitives/hooks";
+-import { Portal as RNPPortal } from "@rn-primitives/portal";
++import { Portal as RNPPortal, PortalHost } from "@rn-primitives/portal";
+ import * as Slot from "@rn-primitives/slot";
+ import * as React from "react";
+ import {
+@@ -430,6 +430,7 @@ export {
+   Label,
+   Overlay,
+   Portal,
++  PortalHost,
+   RadioGroup,
+   RadioItem,
+   Root,
