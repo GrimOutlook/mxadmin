@@ -13,7 +13,6 @@ import { View } from 'react-native';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   NativeSelectScrollView,
   Select,
@@ -23,30 +22,70 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-import { Platform } from 'react-native';
-
-import * as React from 'react';
+import { useState, useEffect } from 'react';
+import { useAppSelector, useAppDispatch } from '@/app/hooks';
+import { DIRECTADMIN_DOMAINS_ENDPOINT, DIRECTADMIN_API_TOKEN_STORAGE_KEY } from '../lib/constants'
+import { selectDirectadminUrl, selectDirectadminUser } from "@/features/settingsSlice";
+import * as SecureStore from 'expo-secure-store';
 
 export default function NewForwarderDialog() {
+  const dispatch = useAppDispatch()
 
-  const domains = [
-    "gmail.com",
-    "yahoo.com",
-    "hotmail.com",
-    "msn.com",
-    "aol.com",
-    "protonmail.com",
-  ]
+  const directadmin_url = useAppSelector(selectDirectadminUrl)
+  const directadmin_user = useAppSelector(selectDirectadminUser)
 
-  const insets = useSafeAreaInsets();
-  const contentInsets = {
-    top: insets.top,
-    bottom: Platform.select({ ios: insets.bottom, android: insets.bottom + 24 }),
-    left: 12,
-    right: 12,
-  };
+  if (!directadmin_url) {
+    console.error("Directadmin URL isn't set. Unable to create new forwarder...")
+    return
+  }
+  if (!directadmin_user) {
+    console.error("Directadmin User isn't set. Unable to create new forwarder...")
+    return
+  }
 
+  // When set to null, it indicates that the domains have not been loaded from
+  // DirectAdmin yet
+  const [domains, setDomains] = useState<string[] | null>(null);
 
+  const [loading, setLoading] = useState(true);
+
+  // This is used to ensure that the width of the `SelectContent` component is
+  // the same as the `SelectTrigger` component. Using `w-full` for both results
+  // in the `SelectContent` taking up the width of the whole page instead of the
+  // width allocated to `Select` or `SelectTrigger`.
+  const [triggerWidth, setTriggerWidth] = useState(0);
+
+  useEffect(() => {
+    const fetchDomains = async () => {
+      // Get the API token from the device's trust store
+      const api_token = await SecureStore.getItemAsync(DIRECTADMIN_API_TOKEN_STORAGE_KEY)
+      // Create the POST query
+      const request = new Request(directadmin_url + DIRECTADMIN_DOMAINS_ENDPOINT, {
+        headers: {
+          user: directadmin_user,
+        }
+      })
+      const response = await fetch(request);
+      const data = await response.json();
+      setDomains(data);
+    }
+
+    const fetchData = async () => {
+      setLoading(true);
+      fetchDomains();
+      setLoading(false);
+    };
+
+    fetchData();
+  })
+
+  // If the loading is finished, but the domains are still null, it means that
+  // an unhandled error occurred.
+  if (!loading && domains === null) {
+    console.error("Failed to get domains from Directadmin. Unable to create new forwarder...")
+    // TODO: Add alert to the user
+    return
+  }
 
   return (
     <Dialog>
@@ -66,13 +105,13 @@ export default function NewForwarderDialog() {
           <Label htmlFor="alias-prefix" nativeID="alias-prefix">Prefix</Label>
           <Input id="alias-prefix" placeholder="Alias Prefix" />
           <Label htmlFor="alias-domain" nativeID="alias-domain">Domain</Label>
-          <Select id="alias-domain" className="z-50">
-            <SelectTrigger className="w-full z-50" >
+          <Select id="alias-domain" >
+            <SelectTrigger className="w-full" onLayout={(e) => setTriggerWidth(e.nativeEvent.layout.width)}>
               <SelectValue placeholder="Alias Domain" />
             </SelectTrigger>
-            <SelectContent insets={contentInsets} className="w-full">
+            <SelectContent style={{ width: triggerWidth }} align="center" >
               <NativeSelectScrollView>
-                {domains.map((domain) => (
+                {domains && domains.map((domain) => (
                   <SelectItem key={domain} label={domain} value={domain}>
                     {domain}
                   </SelectItem>
@@ -81,9 +120,12 @@ export default function NewForwarderDialog() {
             </SelectContent>
           </Select>
         </View>
-        <DialogFooter>
-          <Button className="bg-blue-500">
-            <Text>Create</Text>
+        <DialogFooter className="flex flex-row">
+          <Button variant="outline">
+            <Text>Back</Text>
+          </Button>
+          <Button className="grow bg-blue-500">
+            <Text>Next</Text>
           </Button>
         </DialogFooter>
       </DialogContent>
