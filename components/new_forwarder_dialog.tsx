@@ -22,15 +22,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
-import { DIRECTADMIN_DOMAINS_ENDPOINT, DIRECTADMIN_API_TOKEN_STORAGE_KEY } from '../lib/constants'
 import { selectDirectadminUrl, selectDirectadminUser } from "@/features/settingsSlice";
-import * as SecureStore from 'expo-secure-store';
+import { directadminApi } from '../features/directadminApiSlice'
+import type { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 export default function NewForwarderDialog() {
-  const dispatch = useAppDispatch()
-
   const directadmin_url = useAppSelector(selectDirectadminUrl)
   const directadmin_user = useAppSelector(selectDirectadminUser)
 
@@ -43,11 +41,7 @@ export default function NewForwarderDialog() {
     return
   }
 
-  // When set to null, it indicates that the domains have not been loaded from
-  // DirectAdmin yet
-  const [domains, setDomains] = useState<string[] | null>(null);
-
-  const [loading, setLoading] = useState(true);
+  const { data: domains, error, isLoading, isError } = directadminApi.useGetDomainsQuery();
 
   // This is used to ensure that the width of the `SelectContent` component is
   // the same as the `SelectTrigger` component. Using `w-full` for both results
@@ -55,33 +49,15 @@ export default function NewForwarderDialog() {
   // width allocated to `Select` or `SelectTrigger`.
   const [triggerWidth, setTriggerWidth] = useState(0);
 
-  useEffect(() => {
-    const fetchDomains = async () => {
-      // Get the API token from the device's trust store
-      const api_token = await SecureStore.getItemAsync(DIRECTADMIN_API_TOKEN_STORAGE_KEY)
-      // Create the POST query
-      const request = new Request(directadmin_url + DIRECTADMIN_DOMAINS_ENDPOINT, {
-        headers: {
-          user: directadmin_user,
-        }
-      })
-      const response = await fetch(request);
-      const data = await response.json();
-      setDomains(data);
-    }
+  if (isError) {
+    console.error("Error while trying to get domains from Directadmin")
+    // TODO: Add alert to the user
+    return
+  }
 
-    const fetchData = async () => {
-      setLoading(true);
-      fetchDomains();
-      setLoading(false);
-    };
-
-    fetchData();
-  })
-
-  // If the loading is finished, but the domains are still null, it means that
-  // an unhandled error occurred.
-  if (!loading && domains === null) {
+  // If the loading is finished, but the domains are still null (or undefined),
+  // it means that an unhandled error occurred.
+  if (!isLoading && (domains === null || domains === undefined)) {
     console.error("Failed to get domains from Directadmin. Unable to create new forwarder...")
     // TODO: Add alert to the user
     return

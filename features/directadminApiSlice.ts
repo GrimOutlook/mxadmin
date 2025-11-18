@@ -1,5 +1,7 @@
 import { BaseQueryFn, createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from "@/app/store"
+import { GET_DOMAINS_ENDPOINT, getDomainsResponseSchema } from "../lib/directadmin"
+import * as z from 'zod';
 
 const dynamicBaseQuery: BaseQueryFn = async (args, api, extraOptions) => {
   // Get the necessary information from the store
@@ -16,20 +18,22 @@ const dynamicBaseQuery: BaseQueryFn = async (args, api, extraOptions) => {
       }
       return headers
     },
+    timeout: 10000, // 10 Seconds
   });
 
   return rawBaseQuery(args, api, extraOptions);
 };
 
-export const directadminApiSlice = createApi({
+export const directadminApi = createApi({
   reducerPath: 'directadmin_api',
   baseQuery: dynamicBaseQuery,
   endpoints: (builder) => ({
-    getDomains: builder.query({
-      query: () => '/CMD_API_SHOW_DOMAINS',
+    getDomains: builder.query<z.infer<typeof getDomainsResponseSchema>, void>({
+      query: () => GET_DOMAINS_ENDPOINT,
+      responseSchema: getDomainsResponseSchema,
     }),
   }),
 
 })
 
-export const { useGetDomainsQuery } = directadminApiSlice;
+export const { useGetDomainsQuery } = directadminApi;
