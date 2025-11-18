@@ -25,8 +25,6 @@ import {
 
 import { Platform } from 'react-native';
 
-import type { TriggerRef } from '@rn-primitives/select';
-
 import * as React from 'react';
 
 export default function NewForwarderDialog() {
@@ -40,8 +38,6 @@ export default function NewForwarderDialog() {
     "protonmail.com",
   ]
 
-  const ref = React.useRef<TriggerRef>(null);
-
   const insets = useSafeAreaInsets();
   const contentInsets = {
     top: insets.top,
@@ -49,11 +45,6 @@ export default function NewForwarderDialog() {
     left: 12,
     right: 12,
   };
-
-  // Workaround for rn-primitives/select not opening on mobile
-  function onTouchStart() {
-    ref.current?.open();
-  }
 
 
 
@@ -76,10 +67,10 @@ export default function NewForwarderDialog() {
           <Input id="alias-prefix" placeholder="Alias Prefix" />
           <Label htmlFor="alias-domain" nativeID="alias-domain">Domain</Label>
           <Select id="alias-domain" className="z-50">
-            <SelectTrigger className="w-full z-50">
+            <SelectTrigger className="w-full z-50" >
               <SelectValue placeholder="Alias Domain" />
             </SelectTrigger>
-            <SelectContent insets={contentInsets} className="w-full" portalHost={'select-portal'}>
+            <SelectContent insets={contentInsets} className="w-full">
               <NativeSelectScrollView>
                 {domains.map((domain) => (
                   <SelectItem key={domain} label={domain} value={domain}>

@@ -81,7 +81,7 @@ function SelectContent({
     portalHost?: string;
   }) {
   return (
-    <SelectPrimitive.Portal hostName={portalHost || 'select-portal'}>
+    <SelectPrimitive.Portal hostName={portalHost}>
       <FullWindowOverlay>
         <SelectPrimitive.Overlay style={Platform.select({ native: StyleSheet.absoluteFill })}>
           <TextClassContext.Provider value="text-popover-foreground">
@@ -98,12 +98,12 @@ function SelectContent({
                     native: 'p-1',
                   }),
                   position === 'popper' &&
-                  Platform.select({
-                    web: cn(
-                      props.side === 'bottom' && 'translate-y-1',
-                      props.side === 'top' && '-translate-y-1'
-                    ),
-                  }),
+                    Platform.select({
+                      web: cn(
+                        props.side === 'bottom' && 'translate-y-1',
+                        props.side === 'top' && '-translate-y-1'
+                      ),
+                    }),
                   className
                 )}
                 position={position}
@@ -113,12 +113,12 @@ function SelectContent({
                   className={cn(
                     'p-1',
                     position === 'popper' &&
-                    cn(
-                      'w-full',
-                      Platform.select({
-                        web: 'h-[var(--radix-select-trigger-height)] min-w-[var(--radix-select-trigger-width)]',
-                      })
-                    )
+                      cn(
+                        'w-full',
+                        Platform.select({
+                          web: 'h-[var(--radix-select-trigger-height)] min-w-[var(--radix-select-trigger-width)]',
+                        })
+                      )
                   )}>
                   {children}
                 </SelectPrimitive.Viewport>

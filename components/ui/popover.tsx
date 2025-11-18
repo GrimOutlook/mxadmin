@@ -24,7 +24,7 @@ function PopoverContent({
     portalHost?: string;
   }) {
   return (
-    <PopoverPrimitive.Portal hostName={portalHost || 'popover-portal'}>
+    <PopoverPrimitive.Portal hostName={portalHost}>
       <FullWindowOverlay>
         <PopoverPrimitive.Overlay style={Platform.select({ native: StyleSheet.absoluteFill })}>
           <NativeOnlyAnimatedView entering={FadeIn.duration(200)} exiting={FadeOut}>

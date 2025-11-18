@@ -102,16 +102,16 @@ function DropdownMenuContent({
     portalHost?: string;
   }) {
   return (
-    <DropdownMenuPrimitive.Portal hostName={portalHost || 'dropdown-portal'}>
+    <DropdownMenuPrimitive.Portal hostName={portalHost}>
       <FullWindowOverlay>
         <DropdownMenuPrimitive.Overlay
           style={Platform.select({
             web: overlayStyle ?? undefined,
             native: overlayStyle
               ? StyleSheet.flatten([
-                StyleSheet.absoluteFill,
-                overlayStyle as typeof StyleSheet.absoluteFill,
-              ])
+                  StyleSheet.absoluteFill,
+                  overlayStyle as typeof StyleSheet.absoluteFill,
+                ])
               : StyleSheet.absoluteFill,
           })}
           className={overlayClassName}>
