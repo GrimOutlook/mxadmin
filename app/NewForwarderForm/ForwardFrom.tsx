@@ -13,7 +13,24 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+import { directadminApi } from "@/features/directadminApi";
 export const ForwardFrom = () => {
+
+  const { data: domains, error, isLoading, isError } = directadminApi.useGetDomainsQuery();
+
+  if (isError) {
+    console.error("Error while trying to get domains from Directadmin")
+    // TODO: Add alert to the user
+    return
+  }
+
+  // If the loading is finished, but the domains are still null (or undefined),
+  // it means that an unhandled error occurred.
+  if (!isLoading && (domains === null || domains === undefined)) {
+    console.error("Failed to get domains from Directadmin. Unable to create new forwarder...")
+    // TODO: Add alert to the user
+    return
+  }
 
   // This is used to ensure that the width of the `SelectContent` component is
   // the same as the `SelectTrigger` component. Using `w-full` for both results

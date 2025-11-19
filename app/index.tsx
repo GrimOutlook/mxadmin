@@ -1,13 +1,13 @@
-import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
-import { Text } from '@/components/ui/text';
-import { Card } from '@/components/ui/card';
-import { Stack } from "expo-router"
+import { Button } from '@/components/ui/button';
+import { Stack } from 'expo-router';
 import { MoonStarIcon, SunIcon } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
-import { ScrollView } from 'react-native';
-import NewForwarderDialog from './NewForwarder'
+import { useAppSelector } from './store';
+import { settings } from '@/features/settings';
+import { MainPage } from '@/app/Main';
+import { InitialForm } from '@/app/InitialForm';
 
 const SCREEN_OPTIONS = {
   title: 'MXAdmin',
@@ -16,16 +16,14 @@ const SCREEN_OPTIONS = {
 };
 
 export default function Screen() {
+  const user = useAppSelector(settings);
+  const password = useAppSelector(settings);
+  const loginIsValid = React.useMemo(() => {}, []);
 
   return (
     <>
       <Stack.Screen options={SCREEN_OPTIONS} />
-      <ScrollView className="flex-1 s-full gap-8 p-4 mt-16">
-        <Card className="w-full p-4">
-          <Text className="text-center font-semibold text-lg">New Forwarder</Text>
-          <NewForwarderDialog />
-        </Card>
-      </ScrollView>
+      {loginIsValid ? <MainPage /> : <InitialForm />}
     </>
   );
 }
