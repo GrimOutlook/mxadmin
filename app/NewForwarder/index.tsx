@@ -9,24 +9,11 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { View } from 'react-native';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
 
-import {
-  NativeSelectScrollView,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-
-import { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { selectDirectadminUrl, selectDirectadminUser } from "@/features/settings";
-import { directadminApi } from '../features/directadminApi'
-import type { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { directadminApi } from '@/features/directadminApi'
+import { ForwardFrom } from './ForwardFrom';
 
 export default function NewForwarderDialog() {
   const directadmin_url = useAppSelector(selectDirectadminUrl)
@@ -42,12 +29,6 @@ export default function NewForwarderDialog() {
   }
 
   const { data: domains, error, isLoading, isError } = directadminApi.useGetDomainsQuery();
-
-  // This is used to ensure that the width of the `SelectContent` component is
-  // the same as the `SelectTrigger` component. Using `w-full` for both results
-  // in the `SelectContent` taking up the width of the whole page instead of the
-  // width allocated to `Select` or `SelectTrigger`.
-  const [triggerWidth, setTriggerWidth] = useState(0);
 
   if (isError) {
     console.error("Error while trying to get domains from Directadmin")
@@ -77,25 +58,9 @@ export default function NewForwarderDialog() {
             Create an alias that forwards to a given email address
           </DialogDescription>
         </DialogHeader>
-        <View className="w-full flex flex-col gap-2">
-          <Label htmlFor="alias-prefix" nativeID="alias-prefix">Prefix</Label>
-          <Input id="alias-prefix" placeholder="Alias Prefix" />
-          <Label htmlFor="alias-domain" nativeID="alias-domain">Domain</Label>
-          <Select id="alias-domain" >
-            <SelectTrigger className="w-full" onLayout={(e) => setTriggerWidth(e.nativeEvent.layout.width)}>
-              <SelectValue placeholder="Alias Domain" />
-            </SelectTrigger>
-            <SelectContent style={{ width: triggerWidth }} align="center" >
-              <NativeSelectScrollView>
-                {domains && domains.map((domain) => (
-                  <SelectItem key={domain} label={domain} value={domain}>
-                    {domain}
-                  </SelectItem>
-                ))}
-              </NativeSelectScrollView>
-            </SelectContent>
-          </Select>
-        </View>
+        <main>
+          <ForwardFrom />
+        </main>
         <DialogFooter className="flex flex-row">
           <Button variant="outline">
             <Text>Back</Text>

@@ -7,7 +7,7 @@ import { MoonStarIcon, SunIcon } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import { ScrollView } from 'react-native';
-import NewForwarderDialog from '../components/new_forwarder_dialog'
+import NewForwarderDialog from './NewForwarder'
 
 const SCREEN_OPTIONS = {
   title: 'MXAdmin',
@@ -23,6 +23,7 @@ export default function Screen() {
       <ScrollView className="flex-1 s-full gap-8 p-4 mt-16">
         <Card className="w-full p-4">
           <Text className="text-center font-semibold text-lg">New Forwarder</Text>
+          <NewForwarderDialog />
         </Card>
       </ScrollView>
     </>
