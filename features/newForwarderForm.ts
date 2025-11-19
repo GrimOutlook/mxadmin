@@ -11,7 +11,7 @@ const initialState: NewForwarderFormState = {
   forward_to: null,
 }
 
-export const newForwarderFormSlice = createSlice({
+export const newForwarderForm = createSlice({
   name: 'newForwarderForm',
   initialState,
   reducers: {
@@ -35,5 +35,5 @@ export const newForwarderFormSlice = createSlice({
   }
 })
 
-export const { setNewForwarder, setForwardTo, resetForm } = newForwarderFormSlice.actions
-export const { getNewForwarder, getForwardTo } = newForwarderFormSlice.selectors
+export const { setNewForwarder, setForwardTo, resetForm } = newForwarderForm.actions
+export const { getNewForwarder, getForwardTo } = newForwarderForm.selectors

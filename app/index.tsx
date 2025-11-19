@@ -23,7 +23,6 @@ export default function Screen() {
       <ScrollView className="flex-1 s-full gap-8 p-4 mt-16">
         <Card className="w-full p-4">
           <Text className="text-center font-semibold text-lg">New Forwarder</Text>
-          <NewForwarderDialog />
         </Card>
       </ScrollView>
     </>

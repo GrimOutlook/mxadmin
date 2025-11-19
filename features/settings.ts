@@ -15,7 +15,7 @@ const initialState: SettingsState = {
   directadmin_password: null,
 }
 
-export const settingsSlice = createSlice({
+export const settings = createSlice({
   name: 'settings',
   initialState,
   reducers: {
@@ -44,5 +44,5 @@ export const settingsSlice = createSlice({
   }
 })
 
-export const { setDirectadminUrl, setDirectadminUser, reset } = settingsSlice.actions
-export const { selectDirectadminPassword, selectDirectadminUrl, selectDirectadminUser } = settingsSlice.selectors
+export const { setDirectadminUrl, setDirectadminUser, reset } = settings.actions
+export const { selectDirectadminPassword, selectDirectadminUrl, selectDirectadminUser } = settings.selectors

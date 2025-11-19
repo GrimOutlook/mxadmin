@@ -3,18 +3,18 @@ import {
   configureStore,
 } from "@reduxjs/toolkit";
 
-import { newForwarderFormSlice } from '../features/newForwarderFormSlice'
-import { settingsSlice } from '../features/settingsSlice'
-import { directadminApiSlice } from "@/features/directadminApiSlice";
+import { newForwarderForm } from '../features/newForwarderForm'
+import { settings } from '../features/settings'
+import { directadminApi } from "@/features/directadminApi";
 
 /*
  * `combineSlices` automatically combines the reducers using
  * their `reducerPath`s, therefore we no longer need to call `combineReducers`.
  */
 const rootReducer = combineSlices(
-  directadminApiSlice,
-  newForwarderFormSlice,
-  settingsSlice
+  directadminApi,
+  newForwarderForm,
+  settings,
 );
 
 export const store = configureStore({

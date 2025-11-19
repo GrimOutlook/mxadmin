@@ -24,8 +24,8 @@ import {
 
 import { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
-import { selectDirectadminUrl, selectDirectadminUser } from "@/features/settingsSlice";
-import { directadminApi } from '../features/directadminApiSlice'
+import { selectDirectadminUrl, selectDirectadminUser } from "@/features/settings";
+import { directadminApi } from '../features/directadminApi'
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 export default function NewForwarderDialog() {
