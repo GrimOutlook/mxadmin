@@ -18,15 +18,11 @@ export interface SetupState {
   // Is true when all setup information has been provided, and a successful
   // query to the provided Directadmin instance is achieved.
   isSetup: boolean;
-
-  // Is true when `trySetup` is running
-  isLoading: boolean;
 }
 
 const initialState: SetupState = {
   setupInfo: { password: null, url: null, username: null },
   isSetup: false,
-  isLoading: false,
 };
 
 export const setup = createSlice({
@@ -35,6 +31,7 @@ export const setup = createSlice({
   reducers: {
     setSetupInfo: (state, action: PayloadAction<SetupInfo>) => {
       state.setupInfo = action.payload;
+      state.isSetup = true;
     },
 
     // Take in the setup info, and verify that the information can be used to

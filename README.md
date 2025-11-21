@@ -26,6 +26,13 @@
 ### Resources
 
 - [Directadmin Legacy API Docs](https://docs.directadmin.com/developer/api/legacy-api.html#user-apis)
-- Uses
-[`expo-secure-store`](https://docs.expo.dev/versions/latest/sdk/securestore/) to
-store Directadmin API keys
+- [React-Native Reusables API Docs](https://reactnativereusables.com/docs)
+- [Expo API Docs](https://docs.expo.dev/versions/latest/sdk/)
+    - Uses
+      [`expo-secure-store`](https://docs.expo.dev/versions/latest/sdk/securestore/)
+      to store Directadmin API keys
+- [Zod API Docs](https://zod.dev/)
+- [React Hook Form API Docs](https://react-hook-form.com/docs)
+- [RTK (Redux Toolkit) API Docs](https://redux-toolkit.js.org/api/configureStore)
+- [React Native API Docs](https://reactnative.dev/docs/components-and-apis)
+- [TailwindCSS API Docs](https://tailwindcss.com/docs/)

@@ -1,6 +1,6 @@
 import { combineSlices, configureStore } from '@reduxjs/toolkit';
 
-import { newForwarderForm } from '../features/newForwarderForm';
+import { newForwarderForm } from '@/features/newForwarderForm';
 import { setup } from '@/features/setup';
 import { directadminApi } from '@/features/directadminApi';
 

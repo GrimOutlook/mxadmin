@@ -1,4 +1,4 @@
-import { RootState } from '@/app/store';
+import { RootState } from '@/lib/store';
 import { BaseQueryFn, createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import * as z from 'zod';
 import { GET_DOMAINS_ENDPOINT, getDomainsResponseSchema } from '../lib/directadmin';

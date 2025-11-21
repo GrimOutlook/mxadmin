@@ -6,10 +6,11 @@ import { PortalHost } from '@rn-primitives/portal';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
-import { store } from './store'
+import { store } from '@/lib/store'
 import { Provider } from 'react-redux'
-import { useAppSelector } from './hooks';
+import { useAppSelector } from '@/lib/hooks';
 import { selectIsSetup } from '@/features/setup';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -20,13 +21,15 @@ export {
 export default function Root() {
   const { colorScheme } = useColorScheme();
   return (
-    <Provider store={store}>
-      <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-        <RootNavigator />
-        <PortalHost />
-      </ThemeProvider>
-    </Provider>
+    <SafeAreaProvider>
+      <Provider store={store}>
+        <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+          <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+          <RootNavigator />
+          <PortalHost />
+        </ThemeProvider>
+      </Provider>
+    </SafeAreaProvider>
   );
 }
 
