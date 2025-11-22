@@ -1,7 +1,12 @@
 import { RootState } from '@/lib/store';
 import { BaseQueryFn, createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import * as z from 'zod';
-import { GET_DOMAINS_ENDPOINT, getDomainsResponseSchema } from '../lib/directadmin';
+import {
+  GET_DOMAINS_ENDPOINT,
+  GET_FORWARDERS_ENDPOINT,
+  getDomainsResponseSchema,
+  getForwardersResponseSchema,
+} from '@/lib/directadmin';
 import { basic_auth } from '@/lib/utils';
 import { SetupInfo } from './setup';
 
@@ -30,8 +35,6 @@ export const directadminApi = createApi({
   reducerPath: 'directadmin_api',
   baseQuery: dynamicBaseQuery,
   endpoints: (builder) => ({
-    // TODO: Figure out if `GET_DOMAINS_ENDPOINT` can be removed since this is
-    // only used to verify connection and login capability
     trySetup: builder.query<void, SetupInfo>({
       query: (info) => ({
         url: info.url + GET_DOMAINS_ENDPOINT,
@@ -44,7 +47,12 @@ export const directadminApi = createApi({
       query: () => GET_DOMAINS_ENDPOINT,
       responseSchema: getDomainsResponseSchema,
     }),
+    getForwardersForDomain: builder.query<z.infer<typeof getForwardersResponseSchema>, string>({
+      query: (domain) => GET_FORWARDERS_ENDPOINT + '&domain=' + domain,
+      responseSchema: getForwardersResponseSchema,
+    }),
   }),
 });
 
-export const { useLazyTrySetupQuery, useGetDomainsQuery } = directadminApi;
+export const { useLazyTrySetupQuery, useGetDomainsQuery, useGetForwardersForDomainQuery } =
+  directadminApi;

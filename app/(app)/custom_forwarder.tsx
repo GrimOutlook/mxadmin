@@ -13,12 +13,18 @@ import {
 import { View } from 'react-native';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { NativeSelectScrollView, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  NativeSelectScrollView,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useGetDomainsQuery } from '@/features/directadminApi';
 
-
 interface CustomForwarderFormProps {
-  domain: string
+  domain: string;
 }
 
 const CustomForwarderForm: React.FC<CustomForwarderFormProps> = () => {
@@ -43,21 +49,28 @@ const CustomForwarderForm: React.FC<CustomForwarderFormProps> = () => {
             Create an alias that forwards to a given email address
           </DialogDescription>
         </DialogHeader>
-        <View className="w-full flex flex-col gap-2">
-          <Label htmlFor="alias-prefix" nativeID="alias-prefix">Prefix</Label>
+        <View className="flex w-full flex-col gap-2">
+          <Label htmlFor="alias-prefix" nativeID="alias-prefix">
+            Prefix
+          </Label>
           <Input id="alias-prefix" placeholder="Alias Prefix" />
-          <Label htmlFor="alias-domain" nativeID="alias-domain">Domain</Label>
-          <Select id="alias-domain" >
-            <SelectTrigger className="w-full" onLayout={(e) => setTriggerWidth(e.nativeEvent.layout.width)}>
+          <Label htmlFor="alias-domain" nativeID="alias-domain">
+            Domain
+          </Label>
+          <Select id="alias-domain">
+            <SelectTrigger
+              className="w-full"
+              onLayout={(e) => setTriggerWidth(e.nativeEvent.layout.width)}>
               <SelectValue placeholder="Alias Domain" />
             </SelectTrigger>
-            <SelectContent style={{ width: triggerWidth }} align="center" >
+            <SelectContent style={{ width: triggerWidth }} align="center">
               <NativeSelectScrollView>
-                {domains && domains.map((domain) => (
-                  <SelectItem key={domain} label={domain} value={domain}>
-                    {domain}
-                  </SelectItem>
-                ))}
+                {domains &&
+                  domains.map((domain) => (
+                    <SelectItem key={domain} label={domain} value={domain}>
+                      {domain}
+                    </SelectItem>
+                  ))}
               </NativeSelectScrollView>
             </SelectContent>
           </Select>
@@ -73,6 +86,6 @@ const CustomForwarderForm: React.FC<CustomForwarderFormProps> = () => {
       </DialogContent>
     </Dialog>
   );
-}
+};
 
-export default CustomForwarderForm
+export default CustomForwarderForm;
