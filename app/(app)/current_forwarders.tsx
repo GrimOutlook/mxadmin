@@ -1,17 +1,20 @@
 import { Card } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import { useGetForwardersForDomainQuery } from '@/features/directadminApi';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
 import { toast } from 'sonner-native';
 import { useAppDispatch } from '@/lib/hooks';
 import { resetIsSetup } from '@/features/setup';
 import { View } from 'react-native';
-import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Trash } from 'lucide-react-native';
+import { Icon } from '@/components/ui/icon';
 
 interface CurrentForwarderCardProps {
   domain: string;
@@ -29,34 +32,41 @@ const CurrentForwardersCard: React.FC<CurrentForwarderCardProps> = ({ domain }) 
     dispatch(resetIsSetup());
   }
 
+  const row_className = 'text-sm flex flex-row gap-4 align-items-center justify-between';
+
   return (
     <Card className="p-2">
-      <Accordion type="single" collapsible className="m-2">
-        <AccordionItem value="item-1" className="border-b-0">
-          <AccordionTrigger>
-            <Text>Current Forwarders</Text>
-          </AccordionTrigger>
-          <AccordionContent>
-            {isLoading && (
-              <View className="flex-row">
-                <Skeleton className="h-4 w-48" />
-                <Text> ➜ </Text>
-                <Skeleton className="h-4 w-48" />
-              </View>
-            )}
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button>
+            <Text>View Forwarders</Text>
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="w-full">
+          <DialogHeader>
+            <DialogTitle>Forwarders</DialogTitle>
+          </DialogHeader>
+          <View className="flex flex-col gap-2">
+            <Text className={row_className}></Text>
             {!isLoading &&
               forwarders &&
               Object.keys(forwarders).map((alias, i) => {
                 const targets = forwarders[alias];
                 return targets.map((target, j) => (
-                  <Text key={i + j} className="mt-1">
-                    {alias} ➜ {target}
-                  </Text>
+                  <View key={i + j} className={row_className}>
+                    <View className="flex flex-col">
+                      <Text className="font-semibold">{alias}</Text>
+                      <Text>{target}</Text>
+                    </View>
+                    <Button size="icon" variant="outline">
+                      <Icon as={Trash} />
+                    </Button>
+                  </View>
                 ));
               })}
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+          </View>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
