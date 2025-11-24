@@ -31,8 +31,8 @@ export default function Root() {
             <GestureHandlerRootView>
               <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
               <RootNavigator />
-              <PortalHost />
               <Toaster />
+              <PortalHost />
             </GestureHandlerRootView>
           </ThemeProvider>
         </PersistGate>

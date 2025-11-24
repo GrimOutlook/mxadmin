@@ -36,12 +36,26 @@ export const directadminApi = createApi({
   baseQuery: dynamicBaseQuery,
   endpoints: (builder) => ({
     trySetup: builder.query<void, SetupInfo>({
-      query: (info) => ({
-        url: info.url + GET_DOMAINS_ENDPOINT,
-        headers: {
-          Authorization: basic_auth(info.username, info.password),
-        },
-      }),
+      queryFn: async (info, api, _extraOptions, baseQuery) => {
+        const state = api.getState() as RootState;
+
+        if (state.demo.enabled) {
+          return { data: undefined };
+        }
+
+        const result = baseQuery({
+          url: info.url + GET_DOMAINS_ENDPOINT,
+          headers: {
+            Authorization: basic_auth(info.username, info.password),
+          },
+        });
+
+        if ('error' in result) {
+          return { error: result.error };
+        }
+
+        return { data: undefined };
+      },
     }),
     getDomains: builder.query<z.infer<typeof getDomainsResponseSchema>, void>({
       query: () => GET_DOMAINS_ENDPOINT,

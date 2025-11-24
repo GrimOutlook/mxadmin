@@ -7,13 +7,26 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { useAppSelector } from '@/lib/hooks';
+import { getDemoMode } from '@/features/demo';
+import { demoForwarders } from '@/features/demo';
 
 interface CurrentForwarderCardProps {
   domain: string;
 }
 
 const CurrentForwardersCard: React.FC<CurrentForwarderCardProps> = ({ domain }) => {
-  const { data: forwarders, error, isError, isLoading } = useGetForwardersForDomainQuery(domain);
+  const demoMode = useAppSelector(getDemoMode);
+  const { data, error, isError, isLoading } = useGetForwardersForDomainQuery(domain, {
+    skip: demoMode,
+  });
+
+  let forwarders;
+  if (demoMode) {
+    forwarders = demoForwarders;
+  } else {
+    forwarders = data;
+  }
 
   console.log(forwarders);
 

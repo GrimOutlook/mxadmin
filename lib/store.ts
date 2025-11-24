@@ -7,6 +7,7 @@ import { newForwarderForm } from '@/features/newForwarderForm';
 import { setup } from '@/features/setup';
 import { settings } from '@/features/settings';
 import { directadminApi } from '@/features/directadminApi';
+import { demo } from '@/features/demo';
 
 // NOTE: `redux-persist` tries to use keys with `:` in them which is not
 // allowed. Need to convert them to use a different character.
@@ -40,6 +41,7 @@ const persistedSettings = persistReducer(persistConfig, settings.reducer);
 const persistedSetup = persistReducer(securePersistConfig, setup.reducer);
 
 const rootReducer = combineReducers({
+  demo: demo.reducer,
   directadmin_api: directadminApi.reducer,
   new_forwarder: newForwarderForm.reducer,
   settings: persistedSettings,
