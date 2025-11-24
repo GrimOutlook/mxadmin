@@ -18,8 +18,8 @@ const CurrentForwardersCard: React.FC<CurrentForwarderCardProps> = ({ domain }) 
   console.log(forwarders);
 
   return (
-    <Card>
-      <Accordion type="single" collapsible>
+    <Card className="p-2">
+      <Accordion type="single" collapsible className="m-2">
         <AccordionItem value="item-1">
           <AccordionTrigger>
             <Text>Current Forwarders</Text>
@@ -29,7 +29,7 @@ const CurrentForwardersCard: React.FC<CurrentForwarderCardProps> = ({ domain }) 
               Object.keys(forwarders).map((alias, i) => {
                 const targets = forwarders[alias];
                 return targets.map((target, j) => (
-                  <Text key={i + j}>
+                  <Text key={i + j} className="mt-1">
                     {alias} ➜ {target}
                   </Text>
                 ));
