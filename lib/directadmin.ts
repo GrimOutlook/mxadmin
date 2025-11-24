@@ -5,6 +5,8 @@ import * as z from 'zod';
 // endpoint I implement, or I need to find some function that can be used to
 // catch every API call before it's sent and append this to the URL.
 export const JSON = '?json=yes';
+export const DIRECTADMIN_URL_STORAGE_KEY = 'DirectAdminUrl';
+export const DIRECTADMIN_USERNAME_STORAGE_KEY = 'DirectAdminUsername';
 export const DIRECTADMIN_API_TOKEN_STORAGE_KEY = 'DirectAdminApiToken';
 
 export const GET_DOMAINS_ENDPOINT = '/CMD_API_SHOW_DOMAINS' + JSON;
