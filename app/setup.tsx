@@ -14,6 +14,7 @@ import { selectIsSetup, setSetupInfo } from '@/features/setup';
 import { Platform, View } from 'react-native';
 import { Icon } from '@/components/ui/icon';
 import { Eye } from 'lucide-react-native';
+import { Toggle } from '@/components/ui/toggle';
 
 const schema = z.object({
   url: z.url().min(1, { error: 'URL is required' }),
@@ -101,14 +102,14 @@ export default function Setup() {
                 enterKeyHint="done"
                 inputMode="text"
               />
-              <Button
+              <Toggle
                 className=""
-                size="icon"
+                size="sm"
                 variant="outline"
-                onPressIn={() => setPasswordVisible(true)}
-                onPressOut={() => setPasswordVisible(false)}>
+                pressed={password_visible}
+                onPressedChange={setPasswordVisible}>
                 <Icon as={Eye} />
-              </Button>
+              </Toggle>
             </View>
           )}
         />
