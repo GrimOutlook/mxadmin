@@ -1,20 +1,31 @@
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Text } from '@/components/ui/text';
-import * as React from 'react';
-import { router } from 'expo-router';
-import { useAppDispatch } from '@/lib/hooks';
-import { useLazyTrySetupQuery } from '@/features/directadminApi';
-import { useForm, Controller } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { selectIsSetup, setSetupInfo } from '@/features/setup';
-import { Platform, View } from 'react-native';
 import { Icon } from '@/components/ui/icon';
-import { Eye } from 'lucide-react-native';
+import { Input } from '@/components/ui/input';
+import { Text } from '@/components/ui/text';
 import { Toggle } from '@/components/ui/toggle';
+import { useLazyTrySetupQuery } from '@/features/directadminApi';
+import { setSetupInfo } from '@/features/setup';
+import { errorText } from '@/lib/directadmin';
+import { useAppDispatch } from '@/lib/hooks';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { router } from 'expo-router';
+import { Eye } from 'lucide-react-native';
+import * as React from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { Keyboard, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { toast } from 'sonner-native';
+import * as z from 'zod';
 
 const schema = z.object({
   url: z.url().min(1, { error: 'URL is required' }),
@@ -24,29 +35,37 @@ const schema = z.object({
 
 export default function Setup() {
   const dispatch = useAppDispatch();
-  const { control, handleSubmit, formState } = useForm({
+  const { control, handleSubmit, formState, getValues } = useForm({
     mode: 'onChange',
     resolver: zodResolver(schema),
   });
-  const [trigger, { isLoading, isError, error }] = useLazyTrySetupQuery();
+  const [trigger, try_setup_query] = useLazyTrySetupQuery();
   const [password_visible, setPasswordVisible] = React.useState(false);
 
   const onSubmit = async (data: z.infer<typeof schema>) => {
     console.debug('Running setup test');
+    const toastId = toast.loading('Attempting login', {
+      duration: Infinity,
+    });
     const response = await trigger({ ...data });
     if (response.isSuccess) {
       console.log('Response was successful');
+      toast.success('Login successful', {
+        id: toastId,
+        duration: 3000,
+      });
       // Save the setup information for later use
       dispatch(setSetupInfo(data));
       // If we succeed, redirect to the main page
       router.replace('/');
     } else {
       console.log(
-        'Failed to login to Directadmin URL ',
-        data.url,
-        ' because of error ',
-        response.error
+        'Failed to login to Directadmin URL ' + data.url + ' because of error ' + response.error
       );
+      toast.error('Login failed', {
+        id: toastId,
+        duration: 3000,
+      });
     }
   };
 
@@ -114,10 +133,33 @@ export default function Setup() {
           )}
         />
 
-        <Button disabled={!formState.isValid || isLoading} onPress={handleSubmit(onSubmit)}>
+        <Button
+          disabled={!formState.isValid || try_setup_query.isLoading}
+          onPress={(e) => {
+            Keyboard.dismiss();
+            handleSubmit(onSubmit)(e);
+          }}>
           <Text>Let Me In!</Text>
         </Button>
       </Card>
+      <AlertDialog open={try_setup_query.isError}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Setup Failed</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogDescription>
+            <Text>
+              {!!try_setup_query.error &&
+                errorText(try_setup_query.error as FetchBaseQueryError, getValues('url'))}
+            </Text>
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <Button onPress={try_setup_query.reset}>
+              <Text>OK</Text>
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </SafeAreaView>
   );
 }

@@ -1,3 +1,4 @@
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import * as z from 'zod';
 
 // NOTE: No, you cannot include this in the header instead of in the URL. I
@@ -16,3 +17,16 @@ export const getDomainsResponseSchema = z.string().array();
 
 export const GET_FORWARDERS_ENDPOINT = '/CMD_API_EMAIL_FORWARDERS' + JSON;
 export const getForwardersResponseSchema = z.record(z.string(), z.array(z.string()));
+
+export function errorText(query_error: FetchBaseQueryError, domain: string): string {
+  switch (query_error.status) {
+    case 'TIMEOUT_ERROR':
+      return (
+        query_error.status + ': Failed to connect to ' + domain + '. Verify domain is correct.'
+      );
+    case 'FETCH_ERROR':
+      return query_error.status + ':\n' + query_error.error;
+    default:
+      return 'Unknown error. Verify connection is online and credentials are correct and try again.';
+  }
+}

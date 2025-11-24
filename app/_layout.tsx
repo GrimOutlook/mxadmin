@@ -12,6 +12,9 @@ import { useAppSelector } from '@/lib/hooks';
 import { selectIsSetup } from '@/features/setup';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PersistGate } from 'redux-persist/integration/react';
+import { Toaster } from 'sonner-native';
+import React from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -25,9 +28,12 @@ export default function Root() {
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-            <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-            <RootNavigator />
-            <PortalHost />
+            <GestureHandlerRootView>
+              <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+              <RootNavigator />
+              <PortalHost />
+              <Toaster />
+            </GestureHandlerRootView>
           </ThemeProvider>
         </PersistGate>
       </Provider>
