@@ -31,7 +31,7 @@ export const demoSetupInfo = {
 };
 
 export const demoDomains = ['example.com', 'demo.org'];
-export const demoForwarders = {
+export const demoForwarders: Record<string, Record<string, string[]>> = {
   'example.com': {
     jobs: ['test@demo.org'], // jobs@example.com -> test@demo.org
     spam: ['example@gmail.com'], // spam@example.com -> example@gmail.com

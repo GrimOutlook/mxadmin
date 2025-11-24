@@ -1,5 +1,10 @@
 import { RootState } from '@/lib/store';
-import { BaseQueryFn, createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import {
+  BaseQueryFn,
+  createApi,
+  fetchBaseQuery,
+  FetchBaseQueryError,
+} from '@reduxjs/toolkit/query/react';
 import * as z from 'zod';
 import {
   GET_DOMAINS_ENDPOINT,
@@ -9,6 +14,7 @@ import {
 } from '@/lib/directadmin';
 import { basic_auth } from '@/lib/utils';
 import { SetupInfo } from './setup';
+import { demoDomains, demoForwarders } from './demo';
 
 const dynamicBaseQuery: BaseQueryFn = async (args, api, extraOptions) => {
   // Get the necessary information from the store
@@ -35,12 +41,12 @@ export const directadminApi = createApi({
   reducerPath: 'directadmin_api',
   baseQuery: dynamicBaseQuery,
   endpoints: (builder) => ({
-    trySetup: builder.query<void, SetupInfo>({
+    trySetup: builder.query<{}, SetupInfo>({
       queryFn: async (info, api, _extraOptions, baseQuery) => {
         const state = api.getState() as RootState;
 
         if (state.demo.enabled) {
-          return { data: undefined };
+          return { data: {} };
         }
 
         const result = baseQuery({
@@ -54,15 +60,47 @@ export const directadminApi = createApi({
           return { error: result.error };
         }
 
-        return { data: undefined };
+        return { data: {} };
       },
     }),
     getDomains: builder.query<z.infer<typeof getDomainsResponseSchema>, void>({
-      query: () => GET_DOMAINS_ENDPOINT,
+      queryFn: async (_, api, _extraOptions, baseQuery) => {
+        const state = api.getState() as RootState;
+
+        if (state.demo.enabled) {
+          return { data: demoDomains };
+        }
+
+        const result = await baseQuery({
+          url: GET_DOMAINS_ENDPOINT,
+        });
+
+        if ('error' in result) {
+          return { error: result.error as FetchBaseQueryError };
+        }
+
+        return { data: result.data as z.infer<typeof getDomainsResponseSchema> };
+      },
       responseSchema: getDomainsResponseSchema,
     }),
     getForwardersForDomain: builder.query<z.infer<typeof getForwardersResponseSchema>, string>({
-      query: (domain) => GET_FORWARDERS_ENDPOINT + '&domain=' + domain,
+      queryFn: async (domain, api, _extraOptions, baseQuery) => {
+        const state = api.getState() as RootState;
+
+        if (state.demo.enabled) {
+          return { data: demoForwarders[domain] };
+        }
+
+        const result = await baseQuery({
+          url: GET_FORWARDERS_ENDPOINT + '&domain=' + domain,
+        });
+
+        if ('error' in result) {
+          return { error: result.error as FetchBaseQueryError };
+        }
+
+        return { data: result.data as z.infer<typeof getForwardersResponseSchema> };
+      },
       responseSchema: getForwardersResponseSchema,
     }),
   }),
