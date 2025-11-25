@@ -10,13 +10,35 @@ export const DIRECTADMIN_URL_STORAGE_KEY = 'DirectAdminUrl';
 export const DIRECTADMIN_USERNAME_STORAGE_KEY = 'DirectAdminUsername';
 export const DIRECTADMIN_API_TOKEN_STORAGE_KEY = 'DirectAdminApiToken';
 
+// https://docs.directadmin.com/changelog/version-1.21.3.html#cmd-api-show-domains
 export const GET_DOMAINS_ENDPOINT = '/CMD_API_SHOW_DOMAINS' + JSON;
 // Returns a list of strings according to
 // [the docs](https://docs.directadmin.com/developer/api/legacy-api.html#user-apis)
 export const getDomainsResponseSchema = z.string().array();
+export type GetDomainsResponseType = z.infer<typeof getDomainsResponseSchema>;
 
+// https://docs.directadmin.com/changelog/version-1.21.3.html#cmd-api-show-domains
 export const GET_FORWARDERS_ENDPOINT = '/CMD_API_EMAIL_FORWARDERS' + JSON;
 export const getForwardersResponseSchema = z.record(z.string(), z.array(z.string()));
+export type GetForwardersResponseType = z.infer<typeof getForwardersResponseSchema>;
+
+// https://docs.directadmin.com/changelog/version-1.22.3.html#cmd-api-email-forwarders
+export type AddForwarderProps = {
+  // Domain that this forwarder belongs to
+  domain: string;
+  // Forwarder alias (front part of the email address)
+  user: string;
+  // Email that gets forwarded to
+  email: string;
+};
+
+// https://docs.directadmin.com/changelog/version-1.22.3.html#cmd-api-email-forwarders
+export type DeleteForwarderProps = {
+  // Domain to remove forwarder from
+  domain: string;
+  // Forwarder alias (front part of the email address) to delete
+  select0: string;
+};
 
 export function errorText(query_error: FetchBaseQueryError, domain: string): string {
   switch (query_error.status) {

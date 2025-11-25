@@ -1,11 +1,20 @@
+import { demoDomains, demoForwarders, defaultDemoSettings, DemoSettings } from '@/lib/demo';
+import { AddForwarderProps, DeleteForwarderProps } from '@/lib/directadmin';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface DemoState {
   enabled: boolean;
+  domains: string[];
+  forwarders: Record<string, Record<string, string[]>>;
+  // Settings to use for the demo instance
+  settings: DemoSettings;
 }
 
 const initialState: DemoState = {
   enabled: false,
+  domains: demoDomains,
+  forwarders: demoForwarders,
+  settings: defaultDemoSettings,
 };
 
 export const demo = createSlice({
@@ -15,28 +24,27 @@ export const demo = createSlice({
     setDemoMode: (state, action: PayloadAction<boolean>) => {
       state.enabled = action.payload;
     },
+    setDemoSettings: (state, action: PayloadAction<DemoSettings>) => {
+      state.settings = action.payload;
+    },
+    addDemoForwarder: (state, action: PayloadAction<AddForwarderProps>) => {
+      const props = action.payload;
+      try {
+        state.forwarders[props.domain][props.user].push(props.email);
+      } catch {
+        state.forwarders[props.domain][props.user] = [props.email];
+      }
+    },
+    deleteDemoForwarder: (state, action: PayloadAction<DeleteForwarderProps>) => {
+      const props = action.payload;
+      delete state.forwarders[props.domain][props.select0];
+    },
   },
   selectors: {
     getDemoMode: (state) => state.enabled,
+    getDemoSettings: (state) => state.settings,
   },
 });
 
-export const { setDemoMode } = demo.actions;
-export const { getDemoMode } = demo.selectors;
-
-export const demoSetupInfo = {
-  username: 'demo',
-  password: 'demo',
-  url: 'https://demo.local',
-};
-
-export const demoDomains = ['example.com', 'demo.org'];
-export const demoForwarders: Record<string, Record<string, string[]>> = {
-  'example.com': {
-    jobs: ['test@demo.org'], // jobs@example.com -> test@demo.org
-    spam: ['example@gmail.com'], // spam@example.com -> example@gmail.com
-  },
-  'demo.org': {
-    example: ['example@example.com'], // example@demo.org -> example@example.com
-  },
-};
+export const { setDemoMode, setDemoSettings, addDemoForwarder, deleteDemoForwarder } = demo.actions;
+export const { getDemoMode, getDemoSettings } = demo.selectors;

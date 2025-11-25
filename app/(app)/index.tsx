@@ -16,9 +16,10 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { useAppDispatch } from '@/lib/hooks';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { resetIsSetup } from '@/features/setup';
 import { toast } from 'sonner-native';
+import { selectDefaultDomain, selectDefaultForwardTargets } from '@/features/settings';
 
 // TODO: Add carousel
 // https://rn-carousel.dev/Examples/summary
@@ -51,34 +52,53 @@ const MainPage: React.FC = () => {
 
       // Show result
       if (isError) {
-        toast.error('Failed to process', {
+        toast.error('Failed to get domains', {
           duration: 3000,
         });
+        console.error('Failed to get domains due to error: ' + error);
       }
     }
   }, [isLoading, isError, isSuccess]);
 
+  const default_domain = useAppSelector(selectDefaultDomain);
+  const [selected_domain, setSelectedDomain] = React.useState(default_domain);
+
+  // Select the first domain if no domain is currently selected
+  if (!selected_domain && domains) {
+    setSelectedDomain(domains[0]);
+  }
+
+  // Get the default target for the currently selected domain
+  const default_target = useAppSelector(selectDefaultForwardTargets).find(
+    (entry) => entry.domain == selected_domain
+  )?.target;
+
   return (
     <SafeAreaView className="mt-2 flex h-full flex-col">
-      {
-        domains?.map((domain, idx) => (
-          <View key={idx}>
-            <View className="flex w-full flex-row items-center justify-between px-4">
-              <Text className="text-center text-2xl">{domain}</Text>
-              <Settings />
-            </View>
-            <ScrollView className="p-2">
-              {/* NOTE: For some reason `gap` isn't working when in the scroll view so I moved it here */}
-              <View className="flex flex-col gap-2">
-                <CurrentForwardersCard domain={domain} />
-                <NewForwarderToDefaultCard domain={domain} />
-                {/*<CustomForwarderForm domain={domain} />*/}
-              </View>
-            </ScrollView>
+      {selected_domain && (
+        <View>
+          <View className="flex w-full flex-row items-center justify-between px-4">
+            <Text className="text-center text-2xl">{selected_domain}</Text>
+            <Settings />
           </View>
-          // TODO: Make multiple domains work
-        ))[0]
-      }
+          <ScrollView className="p-2">
+            {/* NOTE: For some reason `gap` isn't working when in the scroll view so I moved it here */}
+            <View className="flex flex-col gap-2">
+              <CurrentForwardersCard domain={selected_domain} />
+              {default_target ? (
+                <NewForwarderToDefaultCard
+                  default_target={default_target}
+                  domain={selected_domain}
+                />
+              ) : (
+                // Make a card to set a default target
+                <></>
+              )}
+              {/*<CustomForwarderForm domain={domain} />*/}
+            </View>
+          </ScrollView>
+        </View>
+      )}
       <AlertDialog open={isError}>
         <AlertDialogContent>
           <AlertDialogHeader>

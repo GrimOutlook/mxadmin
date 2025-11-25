@@ -39,7 +39,7 @@ const CurrentForwardersCard: React.FC<CurrentForwarderCardProps> = ({ domain }) 
   const { data: forwarders, error, isLoading } = useGetForwardersForDomainQuery(domain);
 
   // If there is an error getting the forwarders than this is almost certainly a
-  // setup or network error. Mark the setup information as unverified with will
+  // setup or network error. Mark the setup information as unverified which will
   // cause a redirect to the setup page.
   if (error) {
     toast.error(

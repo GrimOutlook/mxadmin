@@ -9,12 +9,12 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
-import { getDemoMode, setDemoMode } from '@/features/demo';
+import { getDemoMode, getDemoSettings, setDemoMode, setDemoSettings } from '@/features/demo';
 import { SetupInfo } from '@/features/setup';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { Settings } from 'lucide-react-native';
 import { UseFormReset } from 'react-hook-form';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 
 interface SetupSettingsProps {
@@ -27,6 +27,7 @@ const SetupSettings: React.FC<SetupSettingsProps> = ({ reset }) => {
 
   // Check if we are in Demo mode or not.
   const demoMode = useAppSelector(getDemoMode);
+  const settings = useAppSelector(getDemoSettings);
 
   return (
     <Dialog>
@@ -36,27 +37,52 @@ const SetupSettings: React.FC<SetupSettingsProps> = ({ reset }) => {
         </Button>
       </DialogTrigger>
       <DialogContent className="w-fit">
-        <View className="flex flex-row items-center gap-2">
-          <Switch
-            checked={demoMode}
-            onCheckedChange={(demoMode) => {
-              dispatch(setDemoMode(demoMode));
-              !demoMode && reset();
-            }}
-            id="demo"
-            nativeID="demo"
-          />
-          <Label
-            nativeID="demo"
-            htmlFor="demo"
-            onPress={() => {
-              // If we're leaving demo mode, reset the form
-              demoMode && reset();
-              dispatch(setDemoMode(!demoMode));
-            }}>
-            Use Demo User
-          </Label>
-        </View>
+        <ScrollView>
+          <View className="flex flex-row items-center gap-2">
+            <Switch
+              checked={demoMode}
+              onCheckedChange={(demoMode) => {
+                dispatch(setDemoMode(demoMode));
+                !demoMode && reset();
+              }}
+              id="demo"
+              nativeID="demo"
+            />
+            <Label
+              nativeID="demo"
+              htmlFor="demo"
+              onPress={() => {
+                // If we're leaving demo mode, reset the form
+                demoMode && reset();
+                dispatch(setDemoMode(!demoMode));
+              }}>
+              Use Demo User
+            </Label>
+          </View>
+          {demoMode && (
+            <View className="flex flex-row items-center gap-2">
+              <Switch
+                checked={settings.default_target}
+                onCheckedChange={(e) => {
+                  dispatch(setDemoSettings({ ...settings, default_target: e }));
+                }}
+                id="demo"
+                nativeID="demo"
+              />
+              <Label
+                nativeID="demo"
+                htmlFor="demo"
+                onPress={() => {
+                  dispatch(
+                    setDemoSettings({ ...settings, default_target: !settings.default_target })
+                  );
+                }}>
+                Demo Default Targets
+              </Label>
+            </View>
+          )}
+        </ScrollView>
+
         <DialogFooter>
           <DialogClose asChild>
             <Button>

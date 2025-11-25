@@ -7,9 +7,14 @@ import * as z from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { View } from 'react-native';
+import { useAddForwarderToDomainMutation } from '@/features/directadminApi';
+import React from 'react';
+import { toast } from 'sonner-native';
+import { alias_string } from '@/lib/utils';
 
 interface NewCatchAllForwarderCardProps {
   domain: string;
+  default_target: string;
 }
 
 // TODO: Animate the placeholder and preview to cycle through various examples
@@ -19,12 +24,46 @@ const schema = z.object({
   alias: z.string().min(1, { error: 'Forwarder alias is required' }),
 });
 
-const NewForwarderToDefaultCard: React.FC<NewCatchAllForwarderCardProps> = ({ domain }) => {
-  const default_target = 'all@test.com';
+const NewForwarderToDefaultCard: React.FC<NewCatchAllForwarderCardProps> = ({
+  domain,
+  default_target,
+}) => {
   const { control, handleSubmit, formState } = useForm({
     mode: 'onChange',
     resolver: zodResolver(schema),
   });
+
+  // Request to add forwarder
+  const [addForwarder] = useAddForwarderToDomainMutation();
+
+  const onSubmit = async (data: z.infer<typeof schema>) => {
+    const new_forwarder_str = alias_string(data.alias, domain, default_target);
+    const toastId = toast.loading('Creating forwarder: ' + new_forwarder_str, {
+      duration: Infinity,
+    });
+    const toast_attrs = {
+      id: toastId,
+      duration: 3000,
+    };
+    const response = await addForwarder({
+      domain: domain,
+      email: default_target,
+      user: data.alias,
+    }).unwrap();
+    if (response.isSuccess) {
+      const msg = 'Successfully created forwarder: ' + new_forwarder_str;
+      console.debug(msg);
+      toast.success(msg, {
+        ...toast_attrs,
+      });
+    } else {
+      const err_msg = 'Failed to add forwarder: ' + new_forwarder_str;
+      console.log(err_msg + ' because of error ' + response.error);
+      toast.error(err_msg, {
+        ...toast_attrs,
+      });
+    }
+  };
 
   return (
     <Card className="flex flex-col gap-4 p-4">
@@ -54,7 +93,7 @@ const NewForwarderToDefaultCard: React.FC<NewCatchAllForwarderCardProps> = ({ do
         )}
       />
 
-      <Button disabled={!formState.isValid}>
+      <Button disabled={!formState.isValid} onPress={handleSubmit(onSubmit)}>
         <Text>Create</Text>
       </Button>
     </Card>

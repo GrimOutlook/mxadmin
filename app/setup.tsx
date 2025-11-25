@@ -12,7 +12,7 @@ import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { Toggle } from '@/components/ui/toggle';
-import { demoSetupInfo, getDemoMode } from '@/features/demo';
+import { getDemoMode, getDemoSettings } from '@/features/demo';
 import { useLazyTrySetupQuery } from '@/features/directadminApi';
 import { setSetupInfo } from '@/features/setup';
 import { errorText } from '@/lib/directadmin';
@@ -28,6 +28,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { toast } from 'sonner-native';
 import * as z from 'zod';
 import SetupSettings from './setup_settings';
+import { demoDefaultForwarders, demoSetupInfo, setDemoValues } from '@/lib/demo';
+import { setDefaultTargetForDomain } from '@/features/settings';
 
 const schema = z.object({
   url: z
@@ -41,6 +43,19 @@ const schema = z.object({
 // access a DirectAdmin account.
 export default function Setup() {
   const dispatch = useAppDispatch();
+
+  // TODO: Figure out how to rip this into another file without React getting
+  // angry when trying to just use a passed in AppDispatch
+  function setDemoValues() {
+    const settings = useAppSelector(getDemoSettings);
+    if (!settings) return;
+
+    if (settings.default_target) {
+      demoDefaultForwarders.forEach((default_forwarder) => {
+        dispatch(setDefaultTargetForDomain(default_forwarder));
+      });
+    }
+  }
 
   // Whether or not we should utilize the demo information so the user doesn't
   // have to have a valid DirectAdmin login/server to use the app for testing.
@@ -80,7 +95,8 @@ export default function Setup() {
 
     // Add an additional notification that demo mode is in use going forward
     if (demoMode) {
-      toast.info('Continuing with demo user...');
+      toast.info('Setting desired demo values...');
+      setDemoValues(dispatch);
     }
 
     // Let the user know that something is happening in the background that they

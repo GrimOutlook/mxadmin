@@ -3,18 +3,27 @@ import {
   BaseQueryFn,
   createApi,
   fetchBaseQuery,
-  FetchBaseQueryError,
+  QueryReturnValue,
 } from '@reduxjs/toolkit/query/react';
 import * as z from 'zod';
 import {
+  AddForwarderProps,
+  DeleteForwarderProps,
   GET_DOMAINS_ENDPOINT,
   GET_FORWARDERS_ENDPOINT,
   getDomainsResponseSchema,
+  GetDomainsResponseType,
   getForwardersResponseSchema,
+  GetForwardersResponseType,
 } from '@/lib/directadmin';
 import { basic_auth } from '@/lib/utils';
 import { SetupInfo } from './setup';
-import { demoDomains, demoForwarders } from './demo';
+import {
+  addDemoForwarder,
+  deleteDemoForwarder,
+  demoDomains,
+  demoForwarders,
+} from '@/features/demo';
 
 const dynamicBaseQuery: BaseQueryFn = async (args, api, extraOptions) => {
   // Get the necessary information from the store
@@ -43,68 +52,147 @@ export const directadminApi = createApi({
   endpoints: (builder) => ({
     trySetup: builder.query<{}, SetupInfo>({
       queryFn: async (info, api, _extraOptions, baseQuery) => {
+        // Check if demo is enabled. If it is, return an empty array (since we
+        // don't use it anyway). This will return a valid return-code and act as
+        // if the request succeeded.
         const state = api.getState() as RootState;
-
         if (state.demo.enabled) {
           return { data: {} };
         }
 
-        const result = baseQuery({
+        // If not in demo mode run the query as usual
+        const result = await baseQuery({
           url: info.url + GET_DOMAINS_ENDPOINT,
           headers: {
             Authorization: basic_auth(info.username, info.password),
           },
         });
 
-        if ('error' in result) {
-          return { error: result.error };
-        }
-
-        return { data: {} };
+        return result as QueryReturnValue<{}, SetupInfo, undefined>;
       },
     }),
-    getDomains: builder.query<z.infer<typeof getDomainsResponseSchema>, void>({
+    getDomains: builder.query<GetDomainsResponseType, void>({
       queryFn: async (_, api, _extraOptions, baseQuery) => {
+        // Check if demo is enabled. If it is, return the demo array of domains
         const state = api.getState() as RootState;
-
         if (state.demo.enabled) {
           return { data: demoDomains };
         }
 
+        // If not in demo mode run the query as usual
         const result = await baseQuery({
           url: GET_DOMAINS_ENDPOINT,
         });
 
-        if ('error' in result) {
-          return { error: result.error as FetchBaseQueryError };
-        }
-
-        return { data: result.data as z.infer<typeof getDomainsResponseSchema> };
+        return result as QueryReturnValue<GetDomainsResponseType, void, undefined>;
       },
       responseSchema: getDomainsResponseSchema,
     }),
-    getForwardersForDomain: builder.query<z.infer<typeof getForwardersResponseSchema>, string>({
+    getForwardersForDomain: builder.query<GetForwardersResponseType, string>({
       queryFn: async (domain, api, _extraOptions, baseQuery) => {
+        // Check if demo is enabled. If it is, return the demo array of
+        // forwarders
         const state = api.getState() as RootState;
-
         if (state.demo.enabled) {
           return { data: demoForwarders[domain] };
         }
 
+        // If not in demo mode run the query as usual
         const result = await baseQuery({
           url: GET_FORWARDERS_ENDPOINT + '&domain=' + domain,
         });
 
-        if ('error' in result) {
-          return { error: result.error as FetchBaseQueryError };
+        return result as QueryReturnValue<GetForwardersResponseType, string, undefined>;
+      },
+      responseSchema: getForwardersResponseSchema,
+    }),
+    // TODO: Determine the actual return type of this query. The documentation
+    // doesn't say but it's likely just the full list of forwarders for the
+    // domain
+    addForwarderToDomain: builder.mutation<GetForwardersResponseType, AddForwarderProps>({
+      queryFn: async (
+        props,
+        api,
+        _extraOptions,
+        baseQuery
+        // Typescript gets mad if we don't specify the return type since we
+        // reference the state
+      ): Promise<QueryReturnValue<GetForwardersResponseType, AddForwarderProps, undefined>> => {
+        // Check if demo is enabled. If it is, return the demo array of
+        // forwarders
+        const state: RootState = api.getState() as RootState;
+        if (state.demo.enabled) {
+          api.dispatch(addDemoForwarder(props));
+          // FIXME: This will probably not work as my guess is the state in the
+          // variable isn't updated when the dispatch is sent. Probably need to
+          // do getState() again.
+          return {
+            data: state.demo.forwarders[props.domain],
+          };
         }
 
-        return { data: result.data as z.infer<typeof getForwardersResponseSchema> };
+        // If not in demo mode run the query as usual
+        const result = await baseQuery({
+          url:
+            GET_FORWARDERS_ENDPOINT +
+            Object.keys({ ...props, action: 'create' })
+              .map((prop) => `&${prop}=${(props as Record<string, string>)[prop]}`)
+              .join(''),
+        });
+
+        return result as QueryReturnValue<GetForwardersResponseType, AddForwarderProps, undefined>;
+      },
+      responseSchema: getForwardersResponseSchema,
+    }),
+    // TODO: Determine the actual return type of this query. The documentation
+    // doesn't say but it's likely just the full list of forwarders for the
+    // domain
+    deleteForwarderFromDomain: builder.mutation<GetForwardersResponseType, DeleteForwarderProps>({
+      queryFn: async (
+        props,
+        api,
+        _extraOptions,
+        baseQuery
+        // Typescript gets mad if we don't specify the return type since we
+        // reference the state
+      ): Promise<QueryReturnValue<GetForwardersResponseType, DeleteForwarderProps, undefined>> => {
+        // Check if demo is enabled. If it is, return the demo array of
+        // forwarders
+        const state: RootState = api.getState() as RootState;
+        if (state.demo.enabled) {
+          api.dispatch(deleteDemoForwarder(props));
+          // FIXME: This will probably not work as my guess is the state in the
+          // variable isn't updated when the dispatch is sent. Probably need to
+          // do getState() again.
+          return {
+            data: state.demo.forwarders[props.domain],
+          };
+        }
+
+        // If not in demo mode run the query as usual
+        const result = await baseQuery({
+          url:
+            GET_FORWARDERS_ENDPOINT +
+            Object.keys({ ...props, action: 'delete' })
+              .map((prop) => `&${prop}=${(props as Record<string, string>)[prop]}`)
+              .join(''),
+        });
+
+        return result as QueryReturnValue<
+          GetForwardersResponseType,
+          DeleteForwarderProps,
+          undefined
+        >;
       },
       responseSchema: getForwardersResponseSchema,
     }),
   }),
 });
 
-export const { useLazyTrySetupQuery, useGetDomainsQuery, useGetForwardersForDomainQuery } =
-  directadminApi;
+export const {
+  useLazyTrySetupQuery,
+  useGetDomainsQuery,
+  useGetForwardersForDomainQuery,
+  useAddForwarderToDomainMutation,
+  useDeleteForwarderFromDomainMutation,
+} = directadminApi;
