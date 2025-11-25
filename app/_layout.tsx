@@ -10,7 +10,7 @@ import { persistor, store } from '@/lib/store';
 import { Provider } from 'react-redux';
 import { useAppSelector } from '@/lib/hooks';
 import { selectIsSetup } from '@/features/setup';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Toaster } from 'sonner-native';
 import React from 'react';

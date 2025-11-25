@@ -15,6 +15,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Trash } from 'lucide-react-native';
 import { Icon } from '@/components/ui/icon';
+import { ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface CurrentForwarderCardProps {
   domain: string;
@@ -42,29 +44,31 @@ const CurrentForwardersCard: React.FC<CurrentForwarderCardProps> = ({ domain }) 
             <Text>View Forwarders</Text>
           </Button>
         </DialogTrigger>
-        <DialogContent className="w-full">
+        <DialogContent className="m-10 h-full w-full">
           <DialogHeader>
             <DialogTitle>Forwarders</DialogTitle>
           </DialogHeader>
-          <View className="flex flex-col gap-2">
-            <Text className={row_className}></Text>
-            {!isLoading &&
-              forwarders &&
-              Object.keys(forwarders).map((alias, i) => {
-                const targets = forwarders[alias];
-                return targets.map((target, j) => (
-                  <View key={i + j} className={row_className}>
-                    <View className="flex flex-col">
-                      <Text className="font-semibold">{alias}</Text>
-                      <Text>{target}</Text>
+          <ScrollView>
+            <View className="flex flex-col gap-2">
+              <Text className={row_className}></Text>
+              {!isLoading &&
+                forwarders &&
+                Object.keys(forwarders).map((alias, i) => {
+                  const targets = forwarders[alias];
+                  return targets.map((target, j) => (
+                    <View key={i + j} className={row_className}>
+                      <View className="flex flex-col">
+                        <Text className="font-semibold">{alias}</Text>
+                        <Text>{target}</Text>
+                      </View>
+                      <Button size="icon" variant="outline">
+                        <Icon as={Trash} />
+                      </Button>
                     </View>
-                    <Button size="icon" variant="outline">
-                      <Icon as={Trash} />
-                    </Button>
-                  </View>
-                ));
-              })}
-          </View>
+                  ));
+                })}
+            </View>
+          </ScrollView>
         </DialogContent>
       </Dialog>
     </Card>
