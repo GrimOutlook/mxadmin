@@ -12,7 +12,7 @@ import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { Toggle } from '@/components/ui/toggle';
-import { demoSetupInfo, getDemoMode, setDemoMode } from '@/features/demo';
+import { demoSetupInfo, getDemoMode } from '@/features/demo';
 import { useLazyTrySetupQuery } from '@/features/directadminApi';
 import { setSetupInfo } from '@/features/setup';
 import { errorText } from '@/lib/directadmin';
@@ -30,49 +30,78 @@ import * as z from 'zod';
 import SetupSettings from './setup_settings';
 
 const schema = z.object({
-  url: z.url().min(1, { error: 'URL is required' }),
+  url: z.httpUrl().min(1, { error: 'URL is required' }),
   username: z.string().min(1, { error: 'Username is required' }),
   password: z.string().min(1, { error: 'Password is required' }),
 });
 
+// A setup window where the user can enter all the information required to
+// access a DirectAdmin account.
 export default function Setup() {
   const dispatch = useAppDispatch();
+
+  // Whether or not we should utilize the demo information so the user doesn't
+  // have to have a valid DirectAdmin login/server to use the app for testing.
   const demoMode = useAppSelector(getDemoMode);
+
+  // Handles form validation and state management
   const { control, handleSubmit, formState, getValues, reset, setValue } = useForm({
     mode: 'onChange',
     resolver: zodResolver(schema),
   });
 
+  // An on-demand handle to a query that we use to verify if the given setup
+  // information is valid. If this query succeeds with the given information
+  // then the user can be redirected to the main page.
   const [trySetup, try_setup_query] = useLazyTrySetupQuery();
+  // For peeking at the password. I always hate sites that don't let you do
+  // this.
   const [password_visible, setPasswordVisible] = React.useState(false);
 
-  if (demoMode) {
-    setValue('url', demoSetupInfo.url);
-    setValue('username', demoSetupInfo.username);
-    setValue('password', demoSetupInfo.password);
-  }
+  // Sets the information in the fields to demo information. Doesn't really
+  // matter as we just redirect them to the main page but it provides an example
+  // to the user on what the format should look like (even though it's pretty
+  // obvious)
+  React.useEffect(() => {
+    if (demoMode) {
+      setValue('url', demoSetupInfo.url);
+      setValue('username', demoSetupInfo.username);
+      setValue('password', demoSetupInfo.password);
+    }
+  }, [demoMode]);
 
+  // This only gets called when all fields pass validation. If the `onPress`
+  // doesn't seem to be working then there is most likely some kind of
+  // validation error.
   const onSubmit = async (data: z.infer<typeof schema>) => {
     console.debug('Running setup test');
+
+    // Add an additional notification that demo mode is in use going forward
     if (demoMode) {
       toast.info('Continuing with demo user...');
     }
 
+    // Let the user know that something is happening in the background that they
+    // might have to wait for.
     const toastId = toast.loading('Attempting login', {
       duration: Infinity,
     });
+    // Run the test query to see if the setup information is valid.
     const response = await trySetup({ ...data });
     if (response.isSuccess) {
-      console.log('Response was successful');
+      // Let the user know that the query succeeded
+      console.debug('Response was successful');
       toast.success('Login successful', {
         id: toastId,
         duration: 3000,
       });
       // Save the setup information for later use
       dispatch(setSetupInfo(data));
-      // If we succeed, redirect to the main page
+      // And redirect to the main page
       router.replace('/');
     } else {
+      // Notify the use that the information given was invalid. An AlertDialog
+      // will also display with more information.
       console.log(
         'Failed to login to Directadmin URL ' + data.url + ' because of error ' + response.error
       );
@@ -82,6 +111,8 @@ export default function Setup() {
       });
     }
   };
+
+  const errorClassName = 'text-xs color-red-400 w-full text-center';
 
   return (
     <SafeAreaView>
@@ -94,17 +125,21 @@ export default function Setup() {
           name="url"
           control={control}
           render={({ field, fieldState }) => (
-            <Input
-              {...field}
-              onChangeText={field.onChange}
-              autoCapitalize="none"
-              autoComplete="url"
-              keyboardType="url"
-              defaultValue=""
-              placeholder="Directadmin URL"
-              enterKeyHint="next"
-              editable={!demoMode}
-            />
+            <View>
+              <Input
+                {...field}
+                onChangeText={field.onChange}
+                autoCapitalize="none"
+                autoComplete="url"
+                keyboardType="url"
+                defaultValue=""
+                placeholder="Directadmin URL"
+                enterKeyHint="next"
+                editable={!demoMode}
+              />
+
+              <Text className={errorClassName}>{fieldState.error && fieldState.error.message}</Text>
+            </View>
           )}
         />
         <Controller

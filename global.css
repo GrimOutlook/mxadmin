@@ -57,12 +57,3 @@
   }
 }
 
-@layer components {
-    .forwarder-section {
-        @apply flex flex-col gap-2 px-4
-    }
-    .my-label {
-        @apply text-8xl font-semibold
-    }
-}
-
