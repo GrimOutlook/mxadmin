@@ -30,7 +30,9 @@ import * as z from 'zod';
 import SetupSettings from './setup_settings';
 
 const schema = z.object({
-  url: z.httpUrl().min(1, { error: 'URL is required' }),
+  url: z
+    .httpUrl({ error: 'Must be in URL format such as: https://example.mxrouting.net:2222' })
+    .min(1, { error: 'URL is required' }),
   username: z.string().min(1, { error: 'Username is required' }),
   password: z.string().min(1, { error: 'Password is required' }),
 });
@@ -137,8 +139,9 @@ export default function Setup() {
                 enterKeyHint="next"
                 editable={!demoMode}
               />
-
-              <Text className={errorClassName}>{fieldState.error && fieldState.error.message}</Text>
+              {fieldState.error && (
+                <Text className={errorClassName}>{fieldState.error.message}</Text>
+              )}
             </View>
           )}
         />
@@ -146,45 +149,55 @@ export default function Setup() {
           name="username"
           control={control}
           render={({ field, fieldState }) => (
-            <Input
-              {...field}
-              onChangeText={field.onChange}
-              defaultValue=""
-              placeholder="Username"
-              autoComplete="username"
-              autoCapitalize="none"
-              keyboardType="default"
-              enterKeyHint="next"
-              editable={!demoMode}
-            />
+            <View>
+              <Input
+                {...field}
+                onChangeText={field.onChange}
+                defaultValue=""
+                placeholder="Username"
+                autoComplete="username"
+                autoCapitalize="none"
+                keyboardType="default"
+                enterKeyHint="next"
+                editable={!demoMode}
+              />
+              {fieldState.error && (
+                <Text className={errorClassName}>{fieldState.error.message}</Text>
+              )}
+            </View>
           )}
         />
         <Controller
           name="password"
           control={control}
           render={({ field, fieldState }) => (
-            <View className="flex flex-row gap-1">
-              <Input
-                {...field}
-                className="flex-1"
-                onChangeText={field.onChange}
-                secureTextEntry={!password_visible}
-                autoCapitalize="none"
-                autoComplete="new-password"
-                defaultValue=""
-                placeholder="Password"
-                enterKeyHint="done"
-                inputMode="text"
-                editable={!demoMode}
-              />
-              <Toggle
-                className=""
-                size="sm"
-                variant="outline"
-                pressed={password_visible}
-                onPressedChange={setPasswordVisible}>
-                <Icon as={Eye} />
-              </Toggle>
+            <View>
+              <View className="flex flex-row gap-1">
+                <Input
+                  {...field}
+                  className="flex-1"
+                  onChangeText={field.onChange}
+                  secureTextEntry={!password_visible}
+                  autoCapitalize="none"
+                  autoComplete="new-password"
+                  defaultValue=""
+                  placeholder="Password"
+                  enterKeyHint="done"
+                  inputMode="text"
+                  editable={!demoMode}
+                />
+                <Toggle
+                  className=""
+                  size="sm"
+                  variant="outline"
+                  pressed={password_visible}
+                  onPressedChange={setPasswordVisible}>
+                  <Icon as={Eye} />
+                </Toggle>
+              </View>
+              {fieldState.error && (
+                <Text className={errorClassName}>{fieldState.error.message}</Text>
+              )}
             </View>
           )}
         />

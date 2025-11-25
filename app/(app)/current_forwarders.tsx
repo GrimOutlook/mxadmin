@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -12,8 +13,10 @@ import { Text } from '@/components/ui/text';
 import { useGetForwardersForDomainQuery } from '@/features/directadminApi';
 import { resetIsSetup } from '@/features/setup';
 import { useAppDispatch } from '@/lib/hooks';
-import { Trash } from 'lucide-react-native';
-import { ScrollView, View } from 'react-native';
+import { Separator } from '@/components/ui/separator';
+import { Trash2 } from 'lucide-react-native';
+import { ScrollView, View, Dimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { toast } from 'sonner-native';
 
 interface CurrentForwarderCardProps {
@@ -24,6 +27,13 @@ interface CurrentForwarderCardProps {
 // Card that shows what forwarders a domain currently has created for it.
 const CurrentForwardersCard: React.FC<CurrentForwarderCardProps> = ({ domain }) => {
   const dispatch = useAppDispatch();
+
+  // Used to prevent the dialog content from extending outside of the user
+  // accessible area. Couldn't find a way to just wrap it with `SafeAreaView`
+  // and have it actually work.
+  const insets = useSafeAreaInsets();
+  // Used to prevent dialog content from extending too far.
+  const { height } = Dimensions.get('window');
 
   // Gather the forwarders for display
   const { data: forwarders, error, isLoading } = useGetForwardersForDomainQuery(domain);
@@ -40,7 +50,10 @@ const CurrentForwardersCard: React.FC<CurrentForwarderCardProps> = ({ domain }) 
     dispatch(resetIsSetup());
   }
 
-  const row_className = 'text-sm flex flex-row gap-4 align-items-center justify-between';
+  // TODO: Figure out if I can move this to `globals.css` somehow. It seemed
+  // like `@apply` wasn't working for the class I made but I may have been doing
+  // something wrong.
+  const row_className = 'text-sm w-full flex flex-row gap-4 align-items-center justify-between';
 
   return (
     <Card className="p-2">
@@ -50,13 +63,20 @@ const CurrentForwardersCard: React.FC<CurrentForwarderCardProps> = ({ domain }) 
             <Text>View Forwarders</Text>
           </Button>
         </DialogTrigger>
-        <DialogContent className="m-10 h-full w-full">
-          <DialogHeader>
+
+        <DialogContent
+          style={{
+            maxHeight: height - insets.top - insets.bottom - 40,
+            marginTop: insets.top + 20,
+            marginBottom: insets.bottom + 20,
+          }}>
+          <DialogHeader className="border-b-2 border-black">
             <DialogTitle>Forwarders</DialogTitle>
+            <DialogDescription>Forwarders currently made for {domain}</DialogDescription>
+            <Separator />
           </DialogHeader>
-          <ScrollView>
-            <View className="flex flex-col gap-2">
-              <Text className={row_className}></Text>
+          <ScrollView className="h-full">
+            <View className="flex h-full flex-col gap-2">
               {!isLoading &&
                 forwarders &&
                 // An ugly way of iterating through object/Record attributes.
@@ -73,9 +93,9 @@ const CurrentForwardersCard: React.FC<CurrentForwarderCardProps> = ({ domain }) 
                         <Text className="font-semibold">{alias}</Text>
                         <Text>{target}</Text>
                       </View>
-                      {/* FIXME: Make the trash button actually remove aliases. Make sure to add an `Are you sure?` dialog */}
+                      {/* FIXME: Add deleting forwarder. Make sure to add an `Are you sure?` dialog */}
                       <Button size="icon" variant="outline">
-                        <Icon as={Trash} />
+                        <Icon as={Trash2} />
                       </Button>
                     </View>
                   ));

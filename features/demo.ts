@@ -27,7 +27,7 @@ export const { getDemoMode } = demo.selectors;
 export const demoSetupInfo = {
   username: 'demo',
   password: 'demo',
-  url: 'https://demo.org',
+  url: 'https://demo.local',
 };
 
 export const demoDomains = ['example.com', 'demo.org'];
