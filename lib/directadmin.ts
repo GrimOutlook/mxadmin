@@ -17,10 +17,22 @@ export const GET_DOMAINS_ENDPOINT = '/CMD_API_SHOW_DOMAINS' + JSON;
 export const getDomainsResponseSchema = z.string().array();
 export type GetDomainsResponseType = z.infer<typeof getDomainsResponseSchema>;
 
-// https://docs.directadmin.com/changelog/version-1.21.3.html#cmd-api-show-domains
+// https://docs.directadmin.com/changelog/version-1.22.3.html#cmd-api-email-forwarders
 export const GET_FORWARDERS_ENDPOINT = '/CMD_API_EMAIL_FORWARDERS' + JSON;
 export const getForwardersResponseSchema = z.record(z.string(), z.array(z.string()));
 export type GetForwardersResponseType = z.infer<typeof getForwardersResponseSchema>;
+
+export const forwardersActionResponseSchema = z
+  .object({
+    result: z.string(),
+    success: z.string().optional().nullable(),
+    error: z.string().optional().nullable(),
+  })
+  .refine(
+    ({ success, error }) => success != error,
+    'Success and error cannot be declared together and one must be declared.'
+  );
+export type ForwardersActionResponseType = z.infer<typeof forwardersActionResponseSchema>;
 
 // https://docs.directadmin.com/changelog/version-1.22.3.html#cmd-api-email-forwarders
 export type AddForwarderProps = {

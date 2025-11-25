@@ -5,10 +5,11 @@ import {
   fetchBaseQuery,
   QueryReturnValue,
 } from '@reduxjs/toolkit/query/react';
-import * as z from 'zod';
 import {
   AddForwarderProps,
   DeleteForwarderProps,
+  forwardersActionResponseSchema,
+  ForwardersActionResponseType,
   GET_DOMAINS_ENDPOINT,
   GET_FORWARDERS_ENDPOINT,
   getDomainsResponseSchema,
@@ -18,12 +19,7 @@ import {
 } from '@/lib/directadmin';
 import { basic_auth } from '@/lib/utils';
 import { SetupInfo } from './setup';
-import {
-  addDemoForwarder,
-  deleteDemoForwarder,
-  demoDomains,
-  demoForwarders,
-} from '@/features/demo';
+import { addDemoForwarder, deleteDemoForwarder, demoDomains } from '@/features/demo';
 
 const dynamicBaseQuery: BaseQueryFn = async (args, api, extraOptions) => {
   // Get the necessary information from the store
@@ -89,12 +85,17 @@ export const directadminApi = createApi({
       responseSchema: getDomainsResponseSchema,
     }),
     getForwardersForDomain: builder.query<GetForwardersResponseType, string>({
-      queryFn: async (domain, api, _extraOptions, baseQuery) => {
+      queryFn: async (
+        domain,
+        api,
+        _extraOptions,
+        baseQuery
+      ): Promise<QueryReturnValue<GetForwardersResponseType, string, undefined>> => {
         // Check if demo is enabled. If it is, return the demo array of
         // forwarders
         const state = api.getState() as RootState;
         if (state.demo.enabled) {
-          return { data: demoForwarders[domain] };
+          return { data: state.demo.forwarders[domain] };
         }
 
         // If not in demo mode run the query as usual
@@ -106,10 +107,11 @@ export const directadminApi = createApi({
       },
       responseSchema: getForwardersResponseSchema,
     }),
+
     // TODO: Determine the actual return type of this query. The documentation
     // doesn't say but it's likely just the full list of forwarders for the
     // domain
-    addForwarderToDomain: builder.mutation<GetForwardersResponseType, AddForwarderProps>({
+    addForwarderToDomain: builder.mutation<ForwardersActionResponseType, AddForwarderProps>({
       queryFn: async (
         props,
         api,
@@ -117,7 +119,7 @@ export const directadminApi = createApi({
         baseQuery
         // Typescript gets mad if we don't specify the return type since we
         // reference the state
-      ): Promise<QueryReturnValue<GetForwardersResponseType, AddForwarderProps, undefined>> => {
+      ): Promise<QueryReturnValue<ForwardersActionResponseType, AddForwarderProps, undefined>> => {
         // Check if demo is enabled. If it is, return the demo array of
         // forwarders
         const state: RootState = api.getState() as RootState;
@@ -127,7 +129,10 @@ export const directadminApi = createApi({
           // variable isn't updated when the dispatch is sent. Probably need to
           // do getState() again.
           return {
-            data: state.demo.forwarders[props.domain],
+            data: {
+              result: `Alias ${props.user}@${props.domain} -> ${props.email} has been created\n`,
+              success: 'Forwarder Created',
+            },
           };
         }
 
@@ -140,52 +145,63 @@ export const directadminApi = createApi({
               .join(''),
         });
 
-        return result as QueryReturnValue<GetForwardersResponseType, AddForwarderProps, undefined>;
+        return result as QueryReturnValue<
+          ForwardersActionResponseType,
+          AddForwarderProps,
+          undefined
+        >;
       },
-      responseSchema: getForwardersResponseSchema,
+      responseSchema: forwardersActionResponseSchema,
     }),
     // TODO: Determine the actual return type of this query. The documentation
     // doesn't say but it's likely just the full list of forwarders for the
     // domain
-    deleteForwarderFromDomain: builder.mutation<GetForwardersResponseType, DeleteForwarderProps>({
-      queryFn: async (
-        props,
-        api,
-        _extraOptions,
-        baseQuery
-        // Typescript gets mad if we don't specify the return type since we
-        // reference the state
-      ): Promise<QueryReturnValue<GetForwardersResponseType, DeleteForwarderProps, undefined>> => {
-        // Check if demo is enabled. If it is, return the demo array of
-        // forwarders
-        const state: RootState = api.getState() as RootState;
-        if (state.demo.enabled) {
-          api.dispatch(deleteDemoForwarder(props));
-          // FIXME: This will probably not work as my guess is the state in the
-          // variable isn't updated when the dispatch is sent. Probably need to
-          // do getState() again.
-          return {
-            data: state.demo.forwarders[props.domain],
-          };
-        }
+    deleteForwarderFromDomain: builder.mutation<ForwardersActionResponseType, DeleteForwarderProps>(
+      {
+        queryFn: async (
+          props,
+          api,
+          _extraOptions,
+          baseQuery
+          // Typescript gets mad if we don't specify the return type since we
+          // reference the state
+        ): Promise<
+          QueryReturnValue<ForwardersActionResponseType, DeleteForwarderProps, undefined>
+        > => {
+          // Check if demo is enabled. If it is, return the demo array of
+          // forwarders
+          const state: RootState = api.getState() as RootState;
+          if (state.demo.enabled) {
+            api.dispatch(deleteDemoForwarder(props));
+            // FIXME: This will probably not work as my guess is the state in the
+            // variable isn't updated when the dispatch is sent. Probably need to
+            // do getState() again.
+            return {
+              data: {
+                result: '',
+                success: 'Forwarders Deleted',
+              },
+            };
+          }
 
-        // If not in demo mode run the query as usual
-        const result = await baseQuery({
-          url:
-            GET_FORWARDERS_ENDPOINT +
-            Object.keys({ ...props, action: 'delete' })
-              .map((prop) => `&${prop}=${(props as Record<string, string>)[prop]}`)
-              .join(''),
-        });
+          // If not in demo mode run the query as usual
+          const result = await baseQuery({
+            url:
+              GET_FORWARDERS_ENDPOINT +
+              Object.keys({ ...props, action: 'delete' })
+                .map((prop) => `&${prop}=${(props as Record<string, string>)[prop]}`)
+                .join(''),
+          });
 
-        return result as QueryReturnValue<
-          GetForwardersResponseType,
-          DeleteForwarderProps,
-          undefined
-        >;
-      },
-      responseSchema: getForwardersResponseSchema,
-    }),
+          return result as QueryReturnValue<
+            ForwardersActionResponseType,
+            DeleteForwarderProps,
+            undefined
+          >;
+        },
+        responseSchema: forwardersActionResponseSchema,
+      }
+    ),
   }),
 });
 
