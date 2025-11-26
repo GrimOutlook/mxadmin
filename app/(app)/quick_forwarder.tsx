@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Text } from '@/components/ui/text';
@@ -11,6 +11,8 @@ import { useAddForwarderToDomainMutation } from '@/features/directadminApi';
 import React from 'react';
 import { toast } from 'sonner-native';
 import { alias_string } from '@/lib/utils';
+import { resetShownForwarder, showForwarder } from '@/features/newForwarder';
+import { useAppDispatch } from '@/lib/hooks';
 
 interface NewCatchAllForwarderCardProps {
   domain: string;
@@ -20,15 +22,24 @@ interface NewCatchAllForwarderCardProps {
 // TODO: Animate the placeholder and preview to cycle through various examples
 const alias_placeholder = 'example';
 
-const schema = z.object({
-  alias: z.string().min(1, { error: 'Forwarder alias is required' }),
-});
-
 const NewForwarderToDefaultCard: React.FC<NewCatchAllForwarderCardProps> = ({
   domain,
   default_target,
 }) => {
-  const { control, handleSubmit, formState } = useForm({
+  const dispatch = useAppDispatch();
+  const schema = z.object({
+    // TODO: Check to ensure that the alias + @ + domain = a valid email
+    // address.
+    alias: z
+      .string({ error: 'Alias must result in valid email address' })
+      .min(1, { error: 'Forwarder alias is required' }),
+  });
+  const {
+    control,
+    handleSubmit,
+    formState,
+    reset: resetForm,
+  } = useForm({
     mode: 'onChange',
     resolver: zodResolver(schema),
   });
@@ -50,7 +61,7 @@ const NewForwarderToDefaultCard: React.FC<NewCatchAllForwarderCardProps> = ({
       email: default_target,
       user: data.alias,
     }).unwrap();
-    if (response.isSuccess) {
+    if (response.success) {
       const msg = 'Successfully created forwarder: ' + new_forwarder_str;
       console.debug(msg);
       toast.success(msg, {
@@ -63,39 +74,50 @@ const NewForwarderToDefaultCard: React.FC<NewCatchAllForwarderCardProps> = ({
         ...toast_attrs,
       });
     }
+
+    // Clear the form
+    resetForm();
+    dispatch(showForwarder(data.alias));
   };
 
   return (
-    <Card className="flex flex-col gap-4 p-4">
-      <Text className="text-center text-lg font-semibold">New Forwarder To Default</Text>
-      <Controller
-        name="alias"
-        control={control}
-        render={({ field, fieldState }) => (
-          <View>
-            <Input
-              {...field}
-              onChangeText={field.onChange}
-              placeholder={alias_placeholder}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-            {fieldState.error && field.value != '' ? (
-              <Label className="color-red w-full text-center text-sm">
-                {fieldState.error.message}
-              </Label>
-            ) : (
-              <Label className="w-full text-center text-sm opacity-50 color-black">
-                {field.value || alias_placeholder}@{domain} ➜ {default_target}
-              </Label>
-            )}
-          </View>
-        )}
-      />
-
-      <Button disabled={!formState.isValid} onPress={handleSubmit(onSubmit)}>
-        <Text>Create</Text>
-      </Button>
+    <Card className="flex flex-col gap-4">
+      <CardHeader>
+        <CardTitle className="text-center text-lg font-semibold">
+          New Forwarder To Default
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Controller
+          name="alias"
+          control={control}
+          render={({ field, fieldState }) => (
+            <View>
+              <Input
+                {...field}
+                onChangeText={field.onChange}
+                placeholder={alias_placeholder}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              {fieldState.error && field.value != '' ? (
+                <Label className="color-red w-full text-center text-sm">
+                  {fieldState.error.message}
+                </Label>
+              ) : (
+                <Label className="w-full text-center text-sm opacity-50 color-black">
+                  {field.value || alias_placeholder}@{domain} ➜ {default_target}
+                </Label>
+              )}
+            </View>
+          )}
+        />
+      </CardContent>
+      <CardFooter>
+        <Button className="w-full" disabled={!formState.isValid} onPress={handleSubmit(onSubmit)}>
+          <Text>Create</Text>
+        </Button>
+      </CardFooter>
     </Card>
   );
 };

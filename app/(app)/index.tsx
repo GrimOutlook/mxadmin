@@ -6,7 +6,7 @@ import { useGetDomainsQuery } from '@/features/directadminApi';
 
 import NewForwarderToDefaultCard from './quick_forwarder';
 import Settings from './settings';
-import CurrentForwardersCard from './current_forwarders';
+import CurrentForwardersDialog from './current_forwarders';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -20,6 +20,8 @@ import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { resetIsSetup } from '@/features/setup';
 import { toast } from 'sonner-native';
 import { selectDefaultDomain, selectDefaultForwardTargets } from '@/features/settings';
+import SetDefaultForwardTargetCard from './set_default_target';
+import { Separator } from '@/components/ui/separator';
 
 // TODO: Add carousel
 // https://rn-carousel.dev/Examples/summary
@@ -76,27 +78,27 @@ const MainPage: React.FC = () => {
   return (
     <SafeAreaView className="mt-2 flex h-full flex-col">
       {selected_domain && (
-        <View>
-          <View className="flex w-full flex-row items-center justify-between px-4">
+        <View className="flex grow flex-col gap-2">
+          <View className="flex w-full flex-row items-center justify-between px-4 py-2">
             <Text className="text-center text-2xl">{selected_domain}</Text>
             <Settings />
           </View>
-          <ScrollView className="p-2">
+          <Separator />
+          <ScrollView className="grow p-2">
             {/* NOTE: For some reason `gap` isn't working when in the scroll view so I moved it here */}
             <View className="flex flex-col gap-2">
-              <CurrentForwardersCard domain={selected_domain} />
               {default_target ? (
                 <NewForwarderToDefaultCard
                   default_target={default_target}
                   domain={selected_domain}
                 />
               ) : (
-                // Make a card to set a default target
-                <></>
+                <SetDefaultForwardTargetCard domain={selected_domain} />
               )}
               {/*<CustomForwarderForm domain={domain} />*/}
             </View>
           </ScrollView>
+          <CurrentForwardersDialog domain={selected_domain} />
         </View>
       )}
       <AlertDialog open={isError}>

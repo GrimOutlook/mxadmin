@@ -18,8 +18,9 @@ import {
   GetForwardersResponseType,
 } from '@/lib/directadmin';
 import { basic_auth } from '@/lib/utils';
-import { SetupInfo } from './setup';
-import { addDemoForwarder, deleteDemoForwarder, demoDomains } from '@/features/demo';
+import { SetupInfo } from '@/features/setup';
+import { addDemoForwarder, deleteDemoForwarder } from '@/features/demo';
+import { demoDomains } from '@/lib/demo';
 
 const dynamicBaseQuery: BaseQueryFn = async (args, api, extraOptions) => {
   // Get the necessary information from the store
@@ -137,12 +138,11 @@ export const directadminApi = createApi({
         }
 
         // If not in demo mode run the query as usual
+        const body = { ...props, action: 'create' };
         const result = await baseQuery({
-          url:
-            GET_FORWARDERS_ENDPOINT +
-            Object.keys({ ...props, action: 'create' })
-              .map((prop) => `&${prop}=${(props as Record<string, string>)[prop]}`)
-              .join(''),
+          url: GET_FORWARDERS_ENDPOINT,
+          method: 'POST',
+          body,
         });
 
         return result as QueryReturnValue<
@@ -152,6 +152,7 @@ export const directadminApi = createApi({
         >;
       },
       responseSchema: forwardersActionResponseSchema,
+      errorResponseSchema: forwardersActionResponseSchema,
     }),
     // TODO: Determine the actual return type of this query. The documentation
     // doesn't say but it's likely just the full list of forwarders for the
@@ -178,6 +179,8 @@ export const directadminApi = createApi({
             // do getState() again.
             return {
               data: {
+                // Yes the result string is blank. Yes I thought that was odd as
+                // well.
                 result: '',
                 success: 'Forwarders Deleted',
               },
@@ -185,12 +188,11 @@ export const directadminApi = createApi({
           }
 
           // If not in demo mode run the query as usual
+          const body = { ...props, action: 'delete' };
           const result = await baseQuery({
-            url:
-              GET_FORWARDERS_ENDPOINT +
-              Object.keys({ ...props, action: 'delete' })
-                .map((prop) => `&${prop}=${(props as Record<string, string>)[prop]}`)
-                .join(''),
+            url: GET_FORWARDERS_ENDPOINT,
+            method: 'POST',
+            body,
           });
 
           return result as QueryReturnValue<
@@ -200,6 +202,7 @@ export const directadminApi = createApi({
           >;
         },
         responseSchema: forwardersActionResponseSchema,
+        errorResponseSchema: forwardersActionResponseSchema,
       }
     ),
   }),

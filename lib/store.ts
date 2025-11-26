@@ -3,7 +3,7 @@ import { persistStore, persistReducer } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 
-import { newForwarderForm } from '@/features/newForwarderForm';
+import { newForwarder } from '@/features/newForwarder';
 import { setup } from '@/features/setup';
 import { settings } from '@/features/settings';
 import { directadminApi } from '@/features/directadminApi';
@@ -43,7 +43,7 @@ const persistedSetup = persistReducer(securePersistConfig, setup.reducer);
 const rootReducer = combineReducers({
   demo: demo.reducer,
   directadmin_api: directadminApi.reducer,
-  new_forwarder: newForwarderForm.reducer,
+  new_forwarder: newForwarder.reducer,
   settings: persistedSettings,
   setup: persistedSetup,
 });

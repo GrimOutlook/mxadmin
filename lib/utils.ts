@@ -16,3 +16,7 @@ export function basic_auth(username: string, password: string): string {
 export function alias_string(alias: string, domain: string, target: string): string {
   return `${alias}@${domain} ➜ ${target}`;
 }
+
+export interface DomainCardProps {
+  domain: string;
+}
