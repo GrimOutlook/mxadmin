@@ -18,11 +18,14 @@ export interface SetupState {
   // Is true when all setup information has been provided, and a successful
   // query to the provided Directadmin instance is achieved.
   isSetup: boolean;
+
+  selectedDomain: string | null;
 }
 
 const initialState: SetupState = {
   setupInfo: { password: null, url: null, username: null },
   isSetup: false,
+  selectedDomain: null,
 };
 
 export const setup = createSlice({
@@ -42,13 +45,19 @@ export const setup = createSlice({
 
     resetIsSetup: (state) => {
       state.isSetup = initialState.isSetup;
+      state.selectedDomain = initialState.selectedDomain;
+    },
+
+    setCurrentDomain: (state, action: PayloadAction<string>) => {
+      state.selectedDomain = action.payload;
     },
   },
   selectors: {
     selectSetupInfo: (state) => state.setupInfo,
     selectIsSetup: (state) => state.isSetup,
+    selectCurrentDomain: (state) => state.selectedDomain,
   },
 });
 
-export const { setSetupInfo, reset, resetIsSetup } = setup.actions;
-export const { selectSetupInfo, selectIsSetup } = setup.selectors;
+export const { setCurrentDomain, setSetupInfo, reset, resetIsSetup } = setup.actions;
+export const { selectSetupInfo, selectIsSetup, selectCurrentDomain } = setup.selectors;

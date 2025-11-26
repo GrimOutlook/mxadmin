@@ -17,11 +17,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { resetIsSetup } from '@/features/setup';
+import { resetIsSetup, selectCurrentDomain, setCurrentDomain } from '@/features/setup';
 import { toast } from 'sonner-native';
 import { selectDefaultDomain, selectDefaultForwardTargets } from '@/features/settings';
 import SetDefaultForwardTargetCard from './set_default_target';
 import { Separator } from '@/components/ui/separator';
+import DomainSelectionDialog from './domain_selection';
+import { Dialog, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 // TODO: Add carousel
 // https://rn-carousel.dev/Examples/summary
@@ -63,7 +65,12 @@ const MainPage: React.FC = () => {
   }, [isLoading, isError, isSuccess]);
 
   const default_domain = useAppSelector(selectDefaultDomain);
-  const [selected_domain, setSelectedDomain] = React.useState(default_domain);
+  const selected_domain = useAppSelector(selectCurrentDomain);
+
+  // Get the default target for the currently selected domain
+  const default_target = useAppSelector(selectDefaultForwardTargets).find(
+    (entry) => entry.domain == selected_domain
+  )?.target;
 
   if (!domains || !domains[0]) {
     return <Text>Account has no domains associated with it.</Text>;
@@ -71,19 +78,21 @@ const MainPage: React.FC = () => {
 
   // Select the first domain if no domain is currently selected
   if (!selected_domain) {
-    setSelectedDomain(domains[0]);
+    dispatch(setCurrentDomain(default_domain ? default_domain : domains[0]));
   }
-
-  // Get the default target for the currently selected domain
-  const default_target = useAppSelector(selectDefaultForwardTargets).find(
-    (entry) => entry.domain == selected_domain
-  )?.target;
 
   return (
     <SafeAreaView className="mt-2 flex h-full flex-col">
       <View className="flex grow flex-col gap-2">
         <View className="flex w-full flex-row items-center justify-between px-4 py-2">
-          <Text className="text-center text-2xl">{selected_domain}</Text>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="secondary" className="h-fit">
+                <Text className="leading-2 text-xl">{selected_domain}</Text>
+              </Button>
+            </DialogTrigger>
+            <DomainSelectionDialog domains={domains} current_domain={selected_domain!} />
+          </Dialog>
           <Settings />
         </View>
         <Separator />
