@@ -26,7 +26,6 @@ const ForwardersList: React.FC<DomainCardProps> = ({ domain }) => {
   const handleLayout = (event: LayoutChangeEvent) => {
     const { y } = event.nativeEvent.layout;
     setTextPosition(y);
-    console.log('Handle layout: ', y);
   };
 
   // Gather the forwarders for display
@@ -66,7 +65,6 @@ const ForwardersList: React.FC<DomainCardProps> = ({ domain }) => {
 
   useEffect(() => {
     if (textPosition > 0 && scrollViewRef) {
-      console.debug('Scrolling to forwarder at position: ', textPosition);
       scrollViewRef.current?.scrollTo({
         y: textPosition,
         animated: true,
@@ -109,14 +107,13 @@ const ForwardersList: React.FC<DomainCardProps> = ({ domain }) => {
 
   const backgroundColor = flashAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ['#ffffff', '#ffeb3b'], // White to yellow
+    outputRange: ['#ffffff', '#74d4ff'],
   });
 
   return (
     <ScrollView ref={scrollViewRef}>
       <View className="flex h-full flex-col gap-2">
-        {!isLoading &&
-          flat_forwarders &&
+        {flat_forwarders && flat_forwarders.length > 0 ? (
           flat_forwarders.map(({ alias, target }, index) => (
             <Animated.View
               key={index}
@@ -141,7 +138,10 @@ const ForwardersList: React.FC<DomainCardProps> = ({ domain }) => {
                 <Icon as={Trash2} />
               </Button>
             </Animated.View>
-          ))}
+          ))
+        ) : (
+          <Text className="text-xl opacity-50">No forwarders yet!</Text>
+        )}
       </View>
     </ScrollView>
   );

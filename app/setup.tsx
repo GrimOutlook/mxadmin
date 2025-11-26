@@ -107,7 +107,7 @@ export default function Setup() {
     const response = await trySetup({ ...data });
     if (response.isSuccess) {
       // Let the user know that the query succeeded
-      console.debug('Response was successful');
+      console.debug('Setup test was successful');
       toast.success('Login successful', {
         id: toastId,
         duration: 3000,
@@ -221,7 +221,6 @@ export default function Setup() {
           disabled={!demoMode && (!formState.isValid || try_setup_query.isLoading)}
           onPress={(e) => {
             Keyboard.dismiss();
-            console.debug(getValues());
             handleSubmit(onSubmit)(e);
           }}>
           <Text>Let Me In!</Text>

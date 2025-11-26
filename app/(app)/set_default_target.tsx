@@ -51,9 +51,12 @@ const SetDefaultForwardTargetCard: React.FC<DomainCardProps> = ({ domain }) => {
               <Label htmlFor="default-target-email" nativeID="default-target-email">
                 Email
               </Label>
-              <Input {...field} onChangeText={field.onChange} />
+              <Input {...field} id="default-target-input" onChangeText={field.onChange} />
               {fieldState.error && (
-                <Label className="color-red w-full text-center text-sm">
+                <Label
+                  nativeID="default-target-input"
+                  htmlFor="default-target-input"
+                  className="w-full text-center text-sm color-red-400">
                   {fieldState.error.message}
                 </Label>
               )}

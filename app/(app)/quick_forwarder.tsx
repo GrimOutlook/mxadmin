@@ -7,12 +7,16 @@ import * as z from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { View } from 'react-native';
-import { useAddForwarderToDomainMutation } from '@/features/directadminApi';
+import {
+  useAddForwarderToDomainMutation,
+  useGetForwardersForDomainQuery,
+} from '@/features/directadminApi';
 import React from 'react';
 import { toast } from 'sonner-native';
 import { alias_string } from '@/lib/utils';
-import { resetShownForwarder, showForwarder } from '@/features/newForwarder';
+import { showForwarder } from '@/features/newForwarder';
 import { useAppDispatch } from '@/lib/hooks';
+import { resetIsSetup } from '@/features/setup';
 
 interface NewCatchAllForwarderCardProps {
   domain: string;
@@ -27,13 +31,33 @@ const NewForwarderToDefaultCard: React.FC<NewCatchAllForwarderCardProps> = ({
   default_target,
 }) => {
   const dispatch = useAppDispatch();
+
+  // Get the existing forwarders so the user doesn't waste their time trying to
+  // recreate one that already exists.
+  const { data: forwarders, isLoading } = useGetForwardersForDomainQuery(domain);
+
+  if (forwarders === undefined && !isLoading) {
+    dispatch(resetIsSetup());
+  }
+
   const schema = z.object({
-    // TODO: Check to ensure that the alias + @ + domain = a valid email
-    // address.
     alias: z
-      .string({ error: 'Alias must result in valid email address' })
-      .min(1, { error: 'Forwarder alias is required' }),
+      .string()
+      .min(1, { error: 'Forwarder alias is required' })
+      .refine(
+        (alias) => z.email().safeParse(`${alias}@${domain}`).success,
+        'Alias must result in a valid email address'
+      )
+      .refine((alias) => {
+        // Let the user know if the given alias already redirects to the default
+        // target
+        return !Object.entries(forwarders || []).find(
+          ([existing_alias, targets]) =>
+            existing_alias == alias && targets.find((target) => target == default_target)
+        );
+      }, 'Alias already forwards to ' + default_target),
   });
+
   const {
     control,
     handleSubmit,
@@ -95,17 +119,24 @@ const NewForwarderToDefaultCard: React.FC<NewCatchAllForwarderCardProps> = ({
             <View>
               <Input
                 {...field}
+                id="alias-input"
                 onChangeText={field.onChange}
                 placeholder={alias_placeholder}
                 autoCapitalize="none"
                 autoCorrect={false}
               />
               {fieldState.error && field.value != '' ? (
-                <Label className="color-red w-full text-center text-sm">
+                <Label
+                  nativeID="alias-input"
+                  htmlFor="alias-input"
+                  className="w-full text-center text-sm color-red-400">
                   {fieldState.error.message}
                 </Label>
               ) : (
-                <Label className="w-full text-center text-sm opacity-50 color-black">
+                <Label
+                  nativeID="alias-input"
+                  htmlFor="alias-input"
+                  className="w-full text-center text-sm opacity-50 color-black">
                   {field.value || alias_placeholder}@{domain} ➜ {default_target}
                 </Label>
               )}
@@ -114,7 +145,10 @@ const NewForwarderToDefaultCard: React.FC<NewCatchAllForwarderCardProps> = ({
         />
       </CardContent>
       <CardFooter>
-        <Button className="w-full" disabled={!formState.isValid} onPress={handleSubmit(onSubmit)}>
+        <Button
+          className="w-full"
+          disabled={!formState.isValid || isLoading}
+          onPress={handleSubmit(onSubmit)}>
           <Text>Create</Text>
         </Button>
       </CardFooter>

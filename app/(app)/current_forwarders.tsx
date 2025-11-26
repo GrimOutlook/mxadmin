@@ -36,7 +36,7 @@ const CurrentForwardersDialog: React.FC<DomainCardProps> = ({ domain }) => {
         </Button>
       </DialogTrigger>
 
-      <SafeDialogContent>
+      <SafeDialogContent className="h-full">
         <DialogHeader>
           <DialogTitle>Forwarders</DialogTitle>
           <DialogDescription>Forwarders currently made for {domain}</DialogDescription>
