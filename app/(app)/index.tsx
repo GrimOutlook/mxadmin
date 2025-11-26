@@ -65,8 +65,12 @@ const MainPage: React.FC = () => {
   const default_domain = useAppSelector(selectDefaultDomain);
   const [selected_domain, setSelectedDomain] = React.useState(default_domain);
 
+  if (!domains || !domains[0]) {
+    return <Text>Account has no domains associated with it.</Text>;
+  }
+
   // Select the first domain if no domain is currently selected
-  if (!selected_domain && domains) {
+  if (!selected_domain) {
     setSelectedDomain(domains[0]);
   }
 
@@ -77,30 +81,27 @@ const MainPage: React.FC = () => {
 
   return (
     <SafeAreaView className="mt-2 flex h-full flex-col">
-      {selected_domain && (
-        <View className="flex grow flex-col gap-2">
-          <View className="flex w-full flex-row items-center justify-between px-4 py-2">
-            <Text className="text-center text-2xl">{selected_domain}</Text>
-            <Settings />
-          </View>
-          <Separator />
-          <ScrollView className="grow p-2">
-            {/* NOTE: For some reason `gap` isn't working when in the scroll view so I moved it here */}
-            <View className="flex flex-col gap-2">
-              {default_target ? (
-                <NewForwarderToDefaultCard
-                  default_target={default_target}
-                  domain={selected_domain}
-                />
-              ) : (
-                <SetDefaultForwardTargetCard domain={selected_domain} />
-              )}
-              {/*<CustomForwarderForm domain={domain} />*/}
-            </View>
-          </ScrollView>
-          <CurrentForwardersDialog domain={selected_domain} />
+      <View className="flex grow flex-col gap-2">
+        <View className="flex w-full flex-row items-center justify-between px-4 py-2">
+          <Text className="text-center text-2xl">{selected_domain}</Text>
+          <Settings />
         </View>
-      )}
+        <Separator />
+        <ScrollView className="grow p-2">
+          {/* NOTE: For some reason `gap` isn't working when in the scroll view so I moved it here */}
+          <View className="flex flex-col gap-2">
+            {default_target ? (
+              <NewForwarderToDefaultCard
+                default_target={default_target}
+                domain={selected_domain!}
+              />
+            ) : (
+              <SetDefaultForwardTargetCard domain={selected_domain!} />
+            )}
+          </View>
+        </ScrollView>
+        <CurrentForwardersDialog domain={selected_domain!} />
+      </View>
       <AlertDialog open={isError}>
         <AlertDialogContent>
           <AlertDialogHeader>
