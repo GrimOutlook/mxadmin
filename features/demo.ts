@@ -29,7 +29,13 @@ export const demo = createSlice({
     },
     addDemoForwarder: (state, action: PayloadAction<AddForwarderProps>) => {
       const props = action.payload;
-      // TODO: Make this work
+      const current_forwarders = state.forwarders;
+      try {
+        current_forwarders[props.domain][props.user].push(props.email);
+      } catch {
+        current_forwarders[props.domain][props.user] = [props.email];
+      }
+      state.forwarders = current_forwarders;
     },
     deleteDemoForwarder: (state, action: PayloadAction<DeleteForwarderProps>) => {
       const props = action.payload;

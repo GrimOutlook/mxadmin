@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -18,22 +17,15 @@ import { resetIsSetup } from '@/features/setup';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { DomainCardProps } from '@/lib/utils';
 import { Trash2 } from 'lucide-react-native';
-import { Dimensions, ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ScrollView, View } from 'react-native';
 import { toast } from 'sonner-native';
 import React, { useEffect } from 'react';
 import { shownForwarder } from '@/features/newForwarder';
+import { SafeDialogContent } from '@/components/safe_dialog_content';
 
 // Card that shows what forwarders a domain currently has created for it.
 const CurrentForwardersDialog: React.FC<DomainCardProps> = ({ domain }) => {
   const dispatch = useAppDispatch();
-
-  // Used to prevent the dialog content from extending outside of the user
-  // accessible area. Couldn't find a way to just wrap it with `SafeAreaView`
-  // and have it actually work.
-  const insets = useSafeAreaInsets();
-  // Used to prevent dialog content from extending too far.
-  const { height } = Dimensions.get('window');
 
   const [open, setOpen] = React.useState(false);
   const focusedListing = React.useRef(null);
@@ -86,12 +78,7 @@ const CurrentForwardersDialog: React.FC<DomainCardProps> = ({ domain }) => {
         </Button>
       </DialogTrigger>
 
-      <DialogContent
-        style={{
-          maxHeight: height - insets.top - insets.bottom - 40,
-          marginTop: insets.top + 20,
-          marginBottom: insets.bottom + 20,
-        }}>
+      <SafeDialogContent>
         <DialogHeader>
           <DialogTitle>Forwarders</DialogTitle>
           <DialogDescription>Forwarders currently made for {domain}</DialogDescription>
@@ -125,7 +112,7 @@ const CurrentForwardersDialog: React.FC<DomainCardProps> = ({ domain }) => {
               })}
           </View>
         </ScrollView>
-      </DialogContent>
+      </SafeDialogContent>
     </Dialog>
   );
 };

@@ -27,8 +27,8 @@ import { Keyboard, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { toast } from 'sonner-native';
 import * as z from 'zod';
-import SetupSettings from './setup_settings';
-import { demoDefaultForwarders, demoSetupInfo, setDemoValues } from '@/lib/demo';
+import SetupSettingsDialog from './setup_settings';
+import { demoDefaultForwarders, demoSetupInfo } from '@/lib/demo';
 import { setDefaultTargetForDomain } from '@/features/settings';
 
 const schema = z.object({
@@ -43,19 +43,18 @@ const schema = z.object({
 // access a DirectAdmin account.
 export default function Setup() {
   const dispatch = useAppDispatch();
+  const settings = useAppSelector(getDemoSettings);
 
   // TODO: Figure out how to rip this into another file without React getting
   // angry when trying to just use a passed in AppDispatch
-  function setDemoValues() {
-    const settings = useAppSelector(getDemoSettings);
+  const setDemoValues = React.useCallback(() => {
     if (!settings) return;
-
     if (settings.default_target) {
       demoDefaultForwarders.forEach((default_forwarder) => {
         dispatch(setDefaultTargetForDomain(default_forwarder));
       });
     }
-  }
+  }, []);
 
   // Whether or not we should utilize the demo information so the user doesn't
   // have to have a valid DirectAdmin login/server to use the app for testing.
@@ -96,7 +95,7 @@ export default function Setup() {
     // Add an additional notification that demo mode is in use going forward
     if (demoMode) {
       toast.info('Setting desired demo values...');
-      setDemoValues(dispatch);
+      setDemoValues();
     }
 
     // Let the user know that something is happening in the background that they
@@ -137,7 +136,7 @@ export default function Setup() {
       <Card className="s-full m-4 p-4">
         <View className="flex flex-row justify-between">
           <Text className="text-3xl font-semibold">Setup{demoMode && ' (Demo)'}</Text>
-          <SetupSettings reset={reset} />
+          <SetupSettingsDialog reset={reset} />
         </View>
         <Controller
           name="url"

@@ -1,13 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Label } from '@/components/ui/label';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { Dialog, DialogClose, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { getDemoMode, getDemoSettings, setDemoMode, setDemoSettings } from '@/features/demo';
 import { SetupInfo } from '@/features/setup';
@@ -16,13 +10,14 @@ import { Settings } from 'lucide-react-native';
 import { UseFormReset } from 'react-hook-form';
 import { ScrollView, View } from 'react-native';
 import { Text } from '@/components/ui/text';
+import { SafeDialogContent } from '@/components/safe_dialog_content';
 
 interface SetupSettingsProps {
   reset: UseFormReset<SetupInfo>;
 }
 
 // A popover that displays the settings available at setup
-const SetupSettings: React.FC<SetupSettingsProps> = ({ reset }) => {
+const SetupSettingsDialog: React.FC<SetupSettingsProps> = ({ reset }) => {
   const dispatch = useAppDispatch();
 
   // Check if we are in Demo mode or not.
@@ -36,8 +31,8 @@ const SetupSettings: React.FC<SetupSettingsProps> = ({ reset }) => {
           <Icon as={Settings} />
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-fit">
-        <ScrollView>
+      <SafeDialogContent>
+        <ScrollView className="h-full w-full">
           <View className="flex flex-row items-center gap-2">
             <Switch
               checked={demoMode}
@@ -90,9 +85,9 @@ const SetupSettings: React.FC<SetupSettingsProps> = ({ reset }) => {
             </Button>
           </DialogClose>
         </DialogFooter>
-      </DialogContent>
+      </SafeDialogContent>
     </Dialog>
   );
 };
 
-export default SetupSettings;
+export default SetupSettingsDialog;
