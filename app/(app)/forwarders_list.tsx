@@ -7,7 +7,7 @@ import { resetIsSetup } from '@/features/setup';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { DomainCardProps, Forwarder } from '@/lib/utils';
 import React, { useEffect } from 'react';
-import { LayoutChangeEvent, ScrollView, View } from 'react-native';
+import { Animated, LayoutChangeEvent, ScrollView, View } from 'react-native';
 import { toast } from 'sonner-native';
 import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
@@ -71,8 +71,32 @@ const ForwardersList: React.FC<DomainCardProps> = ({ domain }) => {
         y: textPosition,
         animated: true,
       });
-      dispatch(resetShownForwarder());
-      setTextPosition(0);
+      // Flash animation
+      Animated.sequence([
+        Animated.timing(flashAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: false,
+        }),
+        Animated.timing(flashAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: false,
+        }),
+        Animated.timing(flashAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: false,
+        }),
+        Animated.timing(flashAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: false,
+        }),
+      ]).start(() => {
+        dispatch(resetShownForwarder());
+        setTextPosition(0);
+      });
     }
   }, [textPosition]);
 
@@ -81,17 +105,27 @@ const ForwardersList: React.FC<DomainCardProps> = ({ domain }) => {
   // something wrong.
   const row_className = 'text-sm flex flex-row gap-4 align-items-center justify-between max-w-full';
 
+  const flashAnim = React.useRef(new Animated.Value(0)).current;
+
+  const backgroundColor = flashAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['#ffffff', '#ffeb3b'], // White to yellow
+  });
+
   return (
     <ScrollView ref={scrollViewRef}>
       <View className="flex h-full flex-col gap-2">
         {!isLoading &&
           flat_forwarders &&
           flat_forwarders.map(({ alias, target }, index) => (
-            <View
+            <Animated.View
               key={index}
               className={row_className}
               {...(alias == highlightedForwarder?.alias &&
-                target == highlightedForwarder.target && { onLayout: handleLayout })}>
+                target == highlightedForwarder.target && {
+                  onLayout: handleLayout,
+                  style: { backgroundColor: backgroundColor },
+                })}>
               <View className="flex max-w-full flex-1">
                 <Text className="font-semibold">{alias}</Text>
                 <Text>{target}</Text>
@@ -106,7 +140,7 @@ const ForwardersList: React.FC<DomainCardProps> = ({ domain }) => {
                 }}>
                 <Icon as={Trash2} />
               </Button>
-            </View>
+            </Animated.View>
           ))}
       </View>
     </ScrollView>

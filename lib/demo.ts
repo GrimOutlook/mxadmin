@@ -15,6 +15,13 @@ export const demoForwarders: Record<string, Record<string, string[]>> = {
   'example.com': {
     jobs: ['test@demo.org'], // jobs@example.com -> test@demo.org
     spam: ['example@gmail.com'], // spam@example.com -> example@gmail.com
+    aaaa: ['example@gmail.com'],
+    bbbb: ['example@gmail.com'],
+    cccc: ['example@gmail.com'],
+    dddd: ['example@gmail.com'],
+    eeee: ['example@gmail.com'],
+    ffff: ['example@gmail.com'],
+    gggg: ['example@gmail.com'],
   },
   'demo.org': {
     example: ['example@example.com'], // example@demo.org -> example@example.com
