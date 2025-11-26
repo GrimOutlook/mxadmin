@@ -20,3 +20,9 @@ export function alias_string(alias: string, domain: string, target: string): str
 export interface DomainCardProps {
   domain: string;
 }
+
+// A forwarder for a given domain
+export type Forwarder = {
+  alias: string;
+  target: string;
+};

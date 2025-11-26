@@ -1,9 +1,10 @@
+import { Forwarder } from '@/lib/utils';
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 export interface NewForwarderState {
   // Forwarder name to show immediately after adding forwarder. Null otherwise.
-  show_forwarder: string | null;
+  show_forwarder: Forwarder | null;
 }
 
 const initialState: NewForwarderState = {
@@ -14,7 +15,7 @@ export const newForwarder = createSlice({
   name: 'new_forwarder',
   initialState,
   reducers: {
-    showForwarder: (state, action: PayloadAction<string>) => {
+    showForwarder: (state, action: PayloadAction<Forwarder>) => {
       state.show_forwarder = action.payload;
     },
     resetShownForwarder: (state) => {

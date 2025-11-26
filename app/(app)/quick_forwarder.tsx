@@ -77,7 +77,7 @@ const NewForwarderToDefaultCard: React.FC<NewCatchAllForwarderCardProps> = ({
 
     // Clear the form
     resetForm();
-    dispatch(showForwarder(data.alias));
+    dispatch(showForwarder({ alias: data.alias, target: default_target }));
   };
 
   return (

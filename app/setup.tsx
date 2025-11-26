@@ -14,7 +14,9 @@ import { Text } from '@/components/ui/text';
 import { Toggle } from '@/components/ui/toggle';
 import { getDemoMode, getDemoSettings } from '@/features/demo';
 import { useLazyTrySetupQuery } from '@/features/directadminApi';
+import { setDefaultTargetForDomain } from '@/features/settings';
 import { setSetupInfo } from '@/features/setup';
+import { demoDefaultForwarders, demoSetupInfo } from '@/lib/demo';
 import { errorText } from '@/lib/directadmin';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,8 +30,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { toast } from 'sonner-native';
 import * as z from 'zod';
 import SetupSettingsDialog from './setup_settings';
-import { demoDefaultForwarders, demoSetupInfo } from '@/lib/demo';
-import { setDefaultTargetForDomain } from '@/features/settings';
 
 const schema = z.object({
   url: z
