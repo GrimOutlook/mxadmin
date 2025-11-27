@@ -9,11 +9,13 @@ import { setCurrentDomain } from '@/features/setup';
 interface DomainSelectionDialogProps {
   current_domain: string;
   domains: string[];
+  closeDialog: () => void;
 }
 
 const DomainSelectionDialog: React.FC<DomainSelectionDialogProps> = ({
   current_domain,
   domains,
+  closeDialog,
 }) => {
   const dispatch = useAppDispatch();
   return (
@@ -25,10 +27,10 @@ const DomainSelectionDialog: React.FC<DomainSelectionDialogProps> = ({
         <View className="flex w-full flex-col gap-2">
           {domains.map((domain) => (
             <Button
-              variant="outline"
-              className="bg-zinc-200"
+              variant={domain == current_domain ? 'default' : 'outline'}
               onPress={() => {
                 dispatch(setCurrentDomain(domain));
+                closeDialog();
               }}>
               <Text>{domain}</Text>
             </Button>

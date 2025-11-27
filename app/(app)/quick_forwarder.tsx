@@ -136,7 +136,7 @@ const NewForwarderToDefaultCard: React.FC<NewCatchAllForwarderCardProps> = ({
                 <Label
                   nativeID="alias-input"
                   htmlFor="alias-input"
-                  className="w-full text-center text-sm opacity-50 color-black">
+                  className="w-full text-center text-sm opacity-50">
                   {field.value || alias_placeholder}@{domain} ➜ {default_target}
                 </Label>
               )}

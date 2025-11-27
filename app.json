@@ -17,7 +17,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "org.grimoutlook.mxadmin"
     },
     "android": {
       "package": "org.grimoutlook.mxadmin",
