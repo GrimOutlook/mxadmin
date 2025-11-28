@@ -105,14 +105,13 @@ const MainPage: React.FC = () => {
           <Settings />
         </View>
         <Separator />
-        <ScrollView className="grow p-2">
+        <ScrollView className="flex-1 p-2">
           {/* NOTE: For some reason `gap` isn't working when in the scroll view so I moved it here */}
           <View className="flex flex-col gap-2">
-            {default_target ? (
+            {default_target && (
               <NewForwarderToDefaultCard default_target={default_target} domain={current_domain!} />
-            ) : (
-              <SetDefaultForwardTargetCard domain={current_domain!} />
             )}
+            <SetDefaultForwardTargetCard domain={current_domain!} />
           </View>
         </ScrollView>
         <CurrentForwardersDialog domain={current_domain!} />

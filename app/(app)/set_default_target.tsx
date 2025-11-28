@@ -15,8 +15,8 @@ import * as z from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { View } from 'react-native';
-import { useAppDispatch } from '@/lib/hooks';
-import { setDefaultTargetForDomain } from '@/features/settings';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { selectDefaultForwardTargets, setDefaultTargetForDomain } from '@/features/settings';
 
 const schema = z.object({
   email: z.email().min(1, { error: 'Email is required' }),
@@ -24,14 +24,18 @@ const schema = z.object({
 
 const SetDefaultForwardTargetCard: React.FC<DomainCardProps> = ({ domain }) => {
   const dispatch = useAppDispatch();
+  const default_target = useAppSelector(selectDefaultForwardTargets).find(
+    (entry) => entry.domain == domain
+  )?.target;
 
-  const { control, handleSubmit, formState } = useForm({
+  const { control, handleSubmit, reset, formState } = useForm({
     mode: 'onBlur',
     resolver: zodResolver(schema),
   });
 
   const onSubmit = (data: z.infer<typeof schema>) => {
     dispatch(setDefaultTargetForDomain({ domain: domain, target: data.email }));
+    reset();
   };
 
   return (
@@ -51,7 +55,12 @@ const SetDefaultForwardTargetCard: React.FC<DomainCardProps> = ({ domain }) => {
               <Label htmlFor="default-target-email" nativeID="default-target-email">
                 Email
               </Label>
-              <Input {...field} id="default-target-input" onChangeText={field.onChange} />
+              <Input
+                {...field}
+                id="default-target-input"
+                onChangeText={field.onChange}
+                placeholder={'Current: ' + default_target}
+              />
               {fieldState.error && (
                 <Label
                   nativeID="default-target-input"
@@ -65,7 +74,7 @@ const SetDefaultForwardTargetCard: React.FC<DomainCardProps> = ({ domain }) => {
         />
       </CardContent>
       <CardFooter>
-        <Button className="w-full" onPress={handleSubmit(onSubmit)}>
+        <Button className="w-full" disabled={!formState.isValid} onPress={handleSubmit(onSubmit)}>
           <Text>Save</Text>
         </Button>
       </CardFooter>

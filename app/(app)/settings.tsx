@@ -13,13 +13,11 @@ import { useAppDispatch } from '@/lib/hooks';
 import { resetIsSetup } from '@/features/setup';
 import { SafeDialogContent } from '@/components/safe_dialog_content';
 import { View } from 'react-native';
+import ThemeToggle from '@/components/theme_picker';
+import { Separator } from '@/components/ui/separator';
 
 const SettingsDialog: React.FC = () => {
   const dispatch = useAppDispatch();
-
-  const signOut = () => {
-    dispatch(resetIsSetup());
-  };
 
   return (
     <Dialog>
@@ -33,9 +31,14 @@ const SettingsDialog: React.FC = () => {
           <DialogTitle className="leading-2">Settings</DialogTitle>
         </DialogHeader>
         <View className="grow"></View>
-        <DialogFooter>
-          <Button onPress={signOut} variant={'destructive'}>
-            <Text className="w-full text-center">Sign Out</Text>
+        <Separator />
+        <DialogFooter className="flex w-full flex-row gap-2">
+          <ThemeToggle />
+          <Button
+            className="flex-1 grow"
+            onPress={() => dispatch(resetIsSetup())}
+            variant={'destructive'}>
+            <Text className="text-center">Sign Out</Text>
           </Button>
         </DialogFooter>
       </SafeDialogContent>

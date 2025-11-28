@@ -2,9 +2,6 @@ import { MoonStarIcon, SunIcon } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
-import { useAppDispatch, useAppSelector } from '@/lib/hooks';
-import { useEffect } from 'react';
-import { selectTheme, setTheme } from '@/features/settings';
 
 const THEME_ICONS = {
   light: SunIcon,
@@ -12,17 +9,11 @@ const THEME_ICONS = {
 };
 
 function ThemeToggle() {
-  const dispatch = useAppDispatch();
-  const storedTheme = useAppSelector(selectTheme);
-  const { colorScheme, toggleColorScheme, setColorScheme } = useColorScheme();
-
-  useEffect(() => {
-    dispatch(setTheme(colorScheme));
-  }, [colorScheme]);
+  const { colorScheme, setColorScheme } = useColorScheme();
 
   return (
     <Button
-      onPressIn={toggleColorScheme}
+      onPressIn={() => setColorScheme(colorScheme == 'light' ? 'dark' : 'light')}
       size="icon"
       variant="ghost"
       className="ios:size-9 rounded-full web:mx-4">

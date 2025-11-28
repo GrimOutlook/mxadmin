@@ -11,13 +11,13 @@ interface SettingsState {
   // forwarder.
   default_forward_target: { domain: string; target: string }[];
 
-  theme: 'light' | 'dark' | undefined;
+  color_mode: 'light' | 'dark' | undefined;
 }
 
 const initialState: SettingsState = {
   default_domain: null,
   default_forward_target: [],
-  theme: 'light',
+  color_mode: 'light',
 };
 
 export const settings = createSlice({
@@ -34,16 +34,17 @@ export const settings = createSlice({
         // Add the new one
         .concat(action.payload);
     },
-    setTheme: (state, action: PayloadAction<'light' | 'dark' | undefined>) => {
-      state.theme = action.payload;
+    setColorMode: (state, action: PayloadAction<'light' | 'dark' | undefined>) => {
+      state.color_mode = action.payload;
     },
   },
   selectors: {
     selectDefaultForwardTargets: (state) => state.default_forward_target,
     selectDefaultDomain: (state) => state.default_domain,
-    selectTheme: (state) => state.theme,
+    selectColorMode: (state) => state.color_mode,
   },
 });
 
-export const { setDefaultTargetForDomain, setTheme } = settings.actions;
-export const { selectDefaultForwardTargets, selectDefaultDomain, selectTheme } = settings.selectors;
+export const { setDefaultTargetForDomain, setColorMode } = settings.actions;
+export const { selectDefaultForwardTargets, selectDefaultDomain, selectColorMode } =
+  settings.selectors;
