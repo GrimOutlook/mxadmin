@@ -59,7 +59,7 @@ const SetDefaultForwardTargetCard: React.FC<DomainCardProps> = ({ domain }) => {
                 {...field}
                 id="default-target-input"
                 onChangeText={field.onChange}
-                placeholder={'Current: ' + default_target}
+                placeholder={'Current: ' + default_target ? default_target : ''}
               />
               {fieldState.error && (
                 <Label
