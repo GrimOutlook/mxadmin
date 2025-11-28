@@ -23,7 +23,7 @@ import { selectDefaultDomain, selectDefaultForwardTargets } from '@/features/set
 import SetDefaultForwardTargetCard from './set_default_target';
 import { Separator } from '@/components/ui/separator';
 import DomainSelectionDialog from './domain_selection';
-import { Dialog, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 
 // TODO: Add carousel
 // https://rn-carousel.dev/Examples/summary

@@ -14,11 +14,9 @@ import { demo } from '@/features/demo';
 const sanitizedKey = (key: string) => key.replace(/:/g, '_');
 const secureStorage = {
   async setItem(key: string, value: string) {
-    console.debug('Setting item with key: ', key);
     await SecureStore.setItemAsync(sanitizedKey(key), value);
   },
   async getItem(key: string) {
-    console.debug('Getting item with key: ', key);
     return await SecureStore.getItemAsync(sanitizedKey(key));
   },
   async removeItem(key: string) {
@@ -29,13 +27,11 @@ const secureStorage = {
 const securePersistConfig = {
   key: 'secure',
   storage: secureStorage,
-  whitelist: ['setup'],
 };
 
 const persistConfig = {
   key: 'regular',
   storage: AsyncStorage,
-  whitelist: ['settings'],
 };
 
 const persistedSettings = persistReducer(persistConfig, settings.reducer);
