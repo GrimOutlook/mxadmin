@@ -56,7 +56,7 @@ const SetDefaultForwardTargetCard: React.FC<DomainCardProps> = ({ domain }) => {
                 <Label
                   nativeID="default-target-input"
                   htmlFor="default-target-input"
-                  className="w-full text-center text-sm color-red-400">
+                  className="w-full text-center text-sm color-destructive">
                   {fieldState.error.message}
                 </Label>
               )}

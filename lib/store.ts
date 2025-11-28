@@ -18,6 +18,7 @@ const secureStorage = {
     await SecureStore.setItemAsync(sanitizedKey(key), value);
   },
   async getItem(key: string) {
+    console.debug('Getting item with key: ', key);
     return await SecureStore.getItemAsync(sanitizedKey(key));
   },
   async removeItem(key: string) {

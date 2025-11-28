@@ -19,13 +19,13 @@ export interface SetupState {
   // query to the provided Directadmin instance is achieved.
   isSetup: boolean;
 
-  selectedDomain: string | null;
+  currentDomain: string | null;
 }
 
 const initialState: SetupState = {
   setupInfo: { password: null, url: null, username: null },
   isSetup: false,
-  selectedDomain: null,
+  currentDomain: null,
 };
 
 export const setup = createSlice({
@@ -45,17 +45,17 @@ export const setup = createSlice({
 
     resetIsSetup: (state) => {
       state.isSetup = initialState.isSetup;
-      state.selectedDomain = initialState.selectedDomain;
+      state.currentDomain = initialState.currentDomain;
     },
 
     setCurrentDomain: (state, action: PayloadAction<string>) => {
-      state.selectedDomain = action.payload;
+      state.currentDomain = action.payload;
     },
   },
   selectors: {
     selectSetupInfo: (state) => state.setupInfo,
     selectIsSetup: (state) => state.isSetup,
-    selectCurrentDomain: (state) => state.selectedDomain,
+    selectCurrentDomain: (state) => state.currentDomain,
   },
 });
 

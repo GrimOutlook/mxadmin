@@ -27,6 +27,7 @@ const DomainSelectionDialog: React.FC<DomainSelectionDialogProps> = ({
         <View className="flex w-full flex-col gap-2">
           {domains.map((domain) => (
             <Button
+              key={domain}
               variant={domain == current_domain ? 'default' : 'outline'}
               onPress={() => {
                 dispatch(setCurrentDomain(domain));

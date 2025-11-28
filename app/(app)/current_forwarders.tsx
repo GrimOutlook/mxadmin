@@ -31,7 +31,7 @@ const CurrentForwardersDialog: React.FC<DomainCardProps> = ({ domain }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="mx-2 bg-accent">
+        <Button className="mx-2 bg-accent-foreground">
           <Text>View Forwarders</Text>
         </Button>
       </DialogTrigger>

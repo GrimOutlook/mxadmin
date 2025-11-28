@@ -129,7 +129,7 @@ export default function Setup() {
     }
   };
 
-  const errorClassName = 'text-xs color-red-400 w-full text-center';
+  const errorClassName = 'text-xs color-destructive w-full text-center';
 
   return (
     <SafeAreaView>

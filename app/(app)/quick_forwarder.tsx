@@ -129,7 +129,7 @@ const NewForwarderToDefaultCard: React.FC<NewCatchAllForwarderCardProps> = ({
                 <Label
                   nativeID="alias-input"
                   htmlFor="alias-input"
-                  className="w-full text-center text-sm color-red-400">
+                  className="w-full text-center text-sm color-destructive">
                   {fieldState.error.message}
                 </Label>
               ) : (

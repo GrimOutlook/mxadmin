@@ -10,11 +10,14 @@ interface SettingsState {
   // Email that new forwarders will forward to by default when creating a new
   // forwarder.
   default_forward_target: { domain: string; target: string }[];
+
+  theme: 'light' | 'dark' | undefined;
 }
 
 const initialState: SettingsState = {
   default_domain: null,
   default_forward_target: [],
+  theme: 'light',
 };
 
 export const settings = createSlice({
@@ -31,12 +34,16 @@ export const settings = createSlice({
         // Add the new one
         .concat(action.payload);
     },
+    setTheme: (state, action: PayloadAction<'light' | 'dark' | undefined>) => {
+      state.theme = action.payload;
+    },
   },
   selectors: {
     selectDefaultForwardTargets: (state) => state.default_forward_target,
     selectDefaultDomain: (state) => state.default_domain,
+    selectTheme: (state) => state.theme,
   },
 });
 
-export const { setDefaultTargetForDomain } = settings.actions;
-export const { selectDefaultForwardTargets, selectDefaultDomain } = settings.selectors;
+export const { setDefaultTargetForDomain, setTheme } = settings.actions;
+export const { selectDefaultForwardTargets, selectDefaultDomain, selectTheme } = settings.selectors;

@@ -24,20 +24,20 @@ export {
 export default function Root() {
   const { colorScheme } = useColorScheme();
   return (
-    <SafeAreaProvider>
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+          <SafeAreaProvider>
             <GestureHandlerRootView>
               <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
               <RootNavigator />
               <Toaster />
               <PortalHost />
             </GestureHandlerRootView>
-          </ThemeProvider>
-        </PersistGate>
-      </Provider>
-    </SafeAreaProvider>
+          </SafeAreaProvider>
+        </ThemeProvider>
+      </PersistGate>
+    </Provider>
   );
 }
 

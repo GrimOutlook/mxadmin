@@ -64,34 +64,43 @@ const MainPage: React.FC = () => {
     }
   }, [isLoading, isError, isSuccess]);
 
-  const default_domain = useAppSelector(selectDefaultDomain);
-  const selected_domain = useAppSelector(selectCurrentDomain);
+  const current_domain = useAppSelector(selectCurrentDomain);
 
+  const default_domain = useAppSelector(selectDefaultDomain);
   // Get the default target for the currently selected domain
   const default_target = useAppSelector(selectDefaultForwardTargets).find(
-    (entry) => entry.domain == selected_domain
+    (entry) => entry.domain == current_domain
   )?.target;
+
+  React.useEffect(() => {
+    if (!current_domain && domains && domains[0]) {
+      const domain = default_domain ? default_domain : domains[0];
+      console.debug('Selecting default domain: ', domain);
+      dispatch(setCurrentDomain(domain));
+    }
+  });
+
+  const [dialogOpen, setDialogOpen] = React.useState(false);
 
   if (!domains || !domains[0]) {
     return <Text>Account has no domains associated with it.</Text>;
-  }
-
-  // Select the first domain if no domain is currently selected
-  if (!selected_domain) {
-    dispatch(setCurrentDomain(default_domain ? default_domain : domains[0]));
   }
 
   return (
     <SafeAreaView className="mt-2 flex h-full flex-col">
       <View className="flex grow flex-col gap-2">
         <View className="flex w-full flex-row items-center justify-between px-4 py-2">
-          <Dialog>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="secondary" className="h-fit">
-                <Text className="leading-2 text-xl">{selected_domain}</Text>
+                <Text className="leading-2 text-xl">{current_domain}</Text>
               </Button>
             </DialogTrigger>
-            <DomainSelectionDialog domains={domains} current_domain={selected_domain!} />
+            <DomainSelectionDialog
+              closeDialog={() => setDialogOpen(false)}
+              domains={domains}
+              current_domain={current_domain!}
+            />
           </Dialog>
           <Settings />
         </View>
@@ -100,16 +109,13 @@ const MainPage: React.FC = () => {
           {/* NOTE: For some reason `gap` isn't working when in the scroll view so I moved it here */}
           <View className="flex flex-col gap-2">
             {default_target ? (
-              <NewForwarderToDefaultCard
-                default_target={default_target}
-                domain={selected_domain!}
-              />
+              <NewForwarderToDefaultCard default_target={default_target} domain={current_domain!} />
             ) : (
-              <SetDefaultForwardTargetCard domain={selected_domain!} />
+              <SetDefaultForwardTargetCard domain={current_domain!} />
             )}
           </View>
         </ScrollView>
-        <CurrentForwardersDialog domain={selected_domain!} />
+        <CurrentForwardersDialog domain={current_domain!} />
       </View>
       <AlertDialog open={isError}>
         <AlertDialogContent>
