@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mxadmin",
+    "name": "MXAdmin",
     "slug": "mxadmin",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,8 +8,9 @@
     "scheme": "mxadmin",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "githubUrl": "https://github.com/GrimOutlook/mxadmin",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -18,21 +19,21 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "org.grimoutlook.mxadmin"
+      "bundleIdentifier": "dev.grimoutlook.mxadmin"
     },
     "android": {
       "package": "org.grimoutlook.mxadmin",
       "versionCode": 1,
       "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       }
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/icon.png"
     },
     "plugins": [
       "expo-router",
