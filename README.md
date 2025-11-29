@@ -23,6 +23,17 @@
 
 ## Development Information
 
+## Building
+
+### Android App
+
+```bash
+npx expo prebuild
+npx react-native build-android --tasks assembleRelease
+# Output is placed in:
+# $REPO_ROOT/android/app/build/outputs/apk/release/app-release.apk
+```
+
 ### Resources
 
 - [Directadmin Legacy API Docs](https://docs.directadmin.com/developer/api/legacy-api.html#user-apis)
