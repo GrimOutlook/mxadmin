@@ -9,6 +9,9 @@ on:
 jobs:
     build:
         runs-on: ubuntu-latest
+        permissions:
+          contents: write
+          discussions: write
 
         steps:
             - name: Checkout repository
@@ -47,3 +50,5 @@ jobs:
                   files: android/app/build/outputs/apk/release/mxadmin.apk
                   draft: true
                   prerelease: false
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
